@@ -1,0 +1,836 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Котики-математики</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* Одна светлая «книжка-картинка»: пастельная сиреневая комната, карточки как страницы, крупные круглые кнопки */
+:root{
+  --bg:#F1ECFF; --bg2:#E6F4FF; --card:#FFFFFF; --ink:#4A3B5C; --soft:#7A6C8C;
+  --pink:#FF8FB1; --pink2:#FFD1DF; --mint:#8FD9C4; --mint2:#D8F5EC; --sun:#FFD66B; --sun2:#FFF1C7;
+  --sky:#9CC9FF; --sky2:#DDEBFF; --peach:#FFC4A3; --line:#5A4A63; --q:#E0457E;
+  --display:"Comfortaa","Nunito",system-ui,sans-serif; --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%) fixed;background-color:var(--bg);color:var(--ink);font-family:var(--body);font-size:20px;line-height:1.45;font-weight:700;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible{outline:4px solid var(--sky);outline-offset:3px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:10px;padding:10px 0;background:linear-gradient(180deg,var(--bg) 70%,transparent)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.top .grow{flex:1;min-width:0}
+.top h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border-radius:999px;padding:6px 14px;box-shadow:0 2px 0 rgba(90,74,99,.12);font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill svg{width:30px;height:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:10px 20px;border-radius:20px;background:var(--card);font-weight:800;font-size:20px;box-shadow:0 4px 0 rgba(90,74,99,.18);transition:transform .12s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(90,74,99,.18)}
+.btn.main{background:var(--pink);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.12)}
+.btn.mint{background:var(--mint)}
+.btn.sun{background:var(--sun)}
+.btn.sky{background:var(--sky)}
+.btn.small{min-height:46px;font-size:17px;padding:8px 14px;border-radius:16px}
+.btn[disabled]{opacity:.45;cursor:default}
+.card{background:var(--card);border-radius:28px;padding:18px;box-shadow:0 6px 0 rgba(90,74,99,.08)}
+.muted{color:var(--soft);font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid{display:grid;gap:12px}
+[hidden]{display:none!important}
+
+/* выбор котика */
+.cats{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:520px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.catpick{background:var(--card);border-radius:24px;padding:10px 6px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 4px 0 rgba(90,74,99,.1);border:4px solid transparent}
+.catpick svg{width:100%;max-width:140px;height:auto}
+.catpick.on{border-color:var(--pink);background:#FFF5F9}
+.catpick span{font-size:17px}
+input.name{width:100%;font:inherit;font-size:26px;font-weight:800;padding:12px 18px;border-radius:18px;border:3px solid var(--pink2);color:var(--ink);background:#fff}
+.chip{background:var(--sun2);border-radius:999px;padding:6px 14px;font-size:18px}
+
+/* дом */
+.room{width:100%;height:auto;display:block;border-radius:24px;max-width:100%}
+.roombox{position:relative;border-radius:28px;overflow:hidden;box-shadow:0 6px 0 rgba(90,74,99,.08);background:#fff}
+.levels{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:560px){.levels{grid-template-columns:1fr}}
+.lvl{text-align:left;background:var(--card);border-radius:24px;padding:14px 16px;display:flex;gap:12px;align-items:center;box-shadow:0 4px 0 rgba(90,74,99,.1);min-height:96px}
+.lvl .num{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:24px;background:var(--mint2)}
+.lvl.cur .num{background:var(--pink);color:#fff}
+.lvl.locked{opacity:.55}
+.lvl b{display:block;font-size:19px;line-height:1.2}
+.lvl small{display:block;color:var(--soft);font-size:15px;font-weight:700;line-height:1.25;margin-top:2px}
+.dots{display:flex;gap:5px;margin-top:6px}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--pink2);display:block}
+.dots i.on{background:var(--pink)}
+
+/* задача */
+.task{font-size:24px;line-height:1.6;font-weight:700}
+.task .q{border-radius:8px;transition:background .3s}
+.task .q.hl{background:var(--sun2);box-shadow:0 0 0 4px var(--sun2)}
+.kw{text-decoration:underline wavy #FF8FB1;text-decoration-thickness:2px;text-underline-offset:6px}
+.kwl{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.kwl span{background:var(--pink2);border-radius:12px;padding:3px 10px;font-size:16px;line-height:1.35}
+.kwl b{color:var(--q)}
+.about{font-size:18px}
+.nchip{display:inline-block;min-width:2.1em;text-align:center;padding:0 8px;border-radius:12px;background:var(--sky2);border:3px dashed var(--sky);font-weight:900;line-height:1.35;color:var(--ink)}
+.nchip.on{background:var(--mint);border:3px solid var(--mint)}
+.nchip.pulse{animation:pulse 1s ease-in-out infinite}
+.nchip.dead{cursor:default}
+@keyframes pulse{50%{transform:scale(1.15);background:var(--sun)}}
+.taskhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.tag{font-size:15px;color:var(--soft);font-weight:800;letter-spacing:.02em}
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.steps span{font-size:14px;padding:4px 10px;border-radius:999px;background:#fff;color:var(--soft)}
+.steps span.on{background:var(--pink);color:#fff}
+.steps span.done{background:var(--mint2);color:var(--ink)}
+.note{background:repeating-linear-gradient(180deg,#fff 0 37px,#EAF2FF 37px 39px);border-radius:24px;padding:16px 18px;box-shadow:0 6px 0 rgba(90,74,99,.08)}
+.note h3{font-size:18px;margin-bottom:6px;color:var(--soft)}
+.note .sec{margin-top:8px}
+.note .sec:first-of-type{margin-top:0}
+.note ul{margin:0;padding-left:0;list-style:none}
+.note li{font-size:19px}
+.note .lab{font-size:15px;color:var(--soft);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.model{overflow-x:auto;max-width:100%}
+.model svg{width:100%;max-width:440px;height:auto;display:block}
+.mtable{border-collapse:separate;border-spacing:0;font-size:19px;margin:6px 0;background:#fff;border-radius:14px;overflow:hidden;border:2.5px solid var(--line)}
+.mtable th,.mtable td{padding:6px 12px;text-align:center;border-right:2px solid var(--line)}
+.mtable th:last-child,.mtable td:last-child{border-right:none}
+.mtable th{background:var(--sun2);font-size:15px}
+.mtable td{border-top:2px solid var(--line);font-variant-numeric:tabular-nums}
+.mtable td.qq{color:var(--q);font-weight:900}
+.combo{display:flex;flex-direction:column;gap:6px}
+.combo .cap{font-size:15px;color:var(--soft)}
+.sol{font-variant-numeric:tabular-nums}
+.ans{font-family:var(--display);font-size:22px;color:var(--ink);background:var(--sun2);display:inline-block;padding:4px 12px;border-radius:12px;margin-top:6px}
+
+.helper{display:flex;gap:12px;align-items:flex-start}
+.helper .ava{flex:none;width:76px}
+.helper .ava svg{width:76px;height:auto}
+.bubble{position:relative;background:var(--card);border-radius:22px;padding:14px 16px;flex:1;min-width:0;box-shadow:0 4px 0 rgba(90,74,99,.08)}
+.bubble::before{content:"";position:absolute;left:-10px;top:22px;border:10px solid transparent;border-right-color:var(--card);border-left:0}
+.bubble .say{font-size:21px}
+.bubble .stepname{font-size:14px;color:var(--pink);font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.opts{display:grid;gap:10px;margin-top:12px}
+.opt{text-align:left;background:var(--sky2);border-radius:18px;padding:12px 16px;font-size:20px;min-height:56px;border:3px solid transparent}
+.opt.bad{background:#FFE9DF;border-color:var(--peach);opacity:.6}
+.opt.good{background:var(--mint2);border-color:var(--mint)}
+.schemes{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.schemes .opt{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;font-size:17px;line-height:1.25}
+.schemes .opt svg{width:100%;max-width:170px;height:auto}
+.ops{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:480px){.ops{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.op{background:var(--sun2);border-radius:20px;min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:3px solid transparent}
+.op b{font-size:40px;line-height:1;font-family:var(--display)}
+.op small{font-size:15px;color:var(--soft)}
+.op.bad{background:#FFE9DF;opacity:.55}
+.expr{font-family:var(--display);font-size:32px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0 4px;font-variant-numeric:tabular-nums}
+.box{min-width:78px;height:62px;border-radius:16px;border:3px solid var(--pink);background:#FFF5F9;display:inline-grid;place-items:center;padding:0 10px;font-family:var(--display);font-size:32px}
+.box.act{box-shadow:0 0 0 5px var(--pink2)}
+.box.ok{border-color:var(--mint);background:var(--mint2)}
+.keypad{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.key{min-height:60px;border-radius:16px;background:var(--sky2);font-size:28px;font-family:var(--display);font-weight:700;box-shadow:0 3px 0 rgba(90,74,99,.15)}
+.key:active{transform:translateY(2px)}
+.key.ok{background:var(--pink);color:#fff;font-family:var(--body);font-size:22px;font-weight:900}
+.key.del{background:#fff;font-size:16px}
+.hintbox{margin-top:12px;background:var(--sun2);border-radius:18px;padding:12px 14px;font-size:19px}
+.hintbox .model svg{max-width:360px}
+.fb{margin-top:10px;font-size:19px;border-radius:16px;padding:10px 14px}
+.fb.no{background:#FFF0E8}
+.fb.yes{background:var(--mint2)}
+.helpbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.fb.top{margin:0 0 8px;font-size:17px;padding:6px 12px}
+@media (max-width:560px){.helper{flex-direction:column;gap:6px}.helper .ava{width:64px;margin-left:14px}.helper .ava svg{width:64px}.bubble::before{left:34px;top:-10px;border:10px solid transparent;border-bottom-color:var(--card);border-top:0}.keypad{grid-template-columns:repeat(5,minmax(0,1fr))}}
+
+/* магазин */
+.shopgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.item{background:var(--card);border-radius:22px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;box-shadow:0 4px 0 rgba(90,74,99,.08);border:3px solid transparent}
+.item.on{border-color:var(--mint)}
+.item svg.ic{width:96px;height:96px}
+.item .nm{font-size:16px;line-height:1.2;min-height:2.4em;display:flex;align-items:center}
+.item .btn{width:100%;min-height:46px;font-size:16px;padding:6px 8px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{padding:8px 16px;border-radius:999px;background:#fff;font-size:17px;font-weight:800}
+.tab.on{background:var(--ink);color:#fff}
+
+/* окна */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(74,59,92,.45);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));overflow-y:auto}
+.modal{background:var(--card);border-radius:30px;padding:22px;max-width:620px;width:100%;max-height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.modal.center{align-items:center;text-align:center}
+.modal h2{font-size:26px}
+.modal p,.modal li{font-size:18px;font-weight:600;line-height:1.5}
+.modal ul,.modal ol{margin:0;padding-left:22px}
+.reward svg.cat{width:170px;height:auto;animation:hop .7s ease-in-out 2}
+@keyframes hop{50%{transform:translateY(-14px) rotate(-3deg)}}
+.big{font-family:var(--display);font-size:38px;color:var(--pink)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:16px;z-index:60;font-size:17px;max-width:calc(100% - 32px)}
+.confetti{position:fixed;top:-40px;z-index:70;pointer-events:none;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:.9}}
+.pop{animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.92);opacity:.4}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap" id="app"></div>
+<div id="layer"></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- утилиты ---------- */
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function plural(n,f){const m=Math.abs(n)%100,d=m%10;if(m>10&&m<20)return f[2];if(d>1&&d<5)return f[1];if(d===1)return f[0];return f[2];}
+const WD={fish:['рыбка','рыбки','рыбок'],yarn:['клубок','клубка','клубков'],bowl:['миска','миски','мисок'],kitten:['котёнок','котёнка','котят'],
+  basket:['корзинка','корзинки','корзинок'],pillow:['подушка','подушки','подушек'],pillowAcc:['подушку','подушки','подушек'],fishAcc:['рыбку','рыбки','рыбок'],ball:['мячик','мячика','мячиков'],rub:['рубль','рубля','рублей'],
+  can:['банка','банки','банок'],toymouse:['игрушечная мышка','игрушечные мышки','игрушечных мышек'],mouse:['мышка','мышки','мышек']};
+const pw=(n,w)=>plural(n,WD[w]);
+const N=n=>`{{${n}}}`;
+const LINE='#5A4A63';
+let uid=0;
+
+/* ---------- хранение ---------- */
+const KEY='kotiki-math-v1';
+const DEF=()=>({cat:null,name:'',fish:5,owned:['bowl-pink'],wear:{head:null,neck:null},bed:null,bowl:'bowl-pink',on:{},unlocked:1,level:1,streak:{},solved:{},total:0});
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&typeof s==='object')return Object.assign(DEF(),s);}catch(e){}return DEF();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let S=load();
+
+/* ---------- котики ----------
+   Все градиенты, узоры и маски лежат в одном скрытом <svg id="kdefs"> (создаётся один раз),
+   поэтому одинаковые id не дублируются при каждой перерисовке. */
+const CATS={
+  ginger:{label:'Рыжий',fur:'#FFC27A',hi:'#FFE6C2',dark:'#EE9748',belly:'#FFF3E2',ear:'#FFB0C0',iris:'#A6E0A0',iris2:'#3E9B57',pat:'tabby'},
+  grey:{label:'Серый полосатый',fur:'#C5CCD8',hi:'#EEF1F6',dark:'#8C96AA',belly:'#F6F7FB',ear:'#FFC0CE',iris:'#FBE08A',iris2:'#D0961C',pat:'tabby'},
+  white:{label:'Белый пушистый',fur:'#FFFFFF',hi:'#FFFFFF',dark:'#E7DDF3',belly:'#FFFFFF',ear:'#FFBFCD',iris:'#B9DDFB',iris2:'#4C8FD6',pat:'none'},
+  black:{label:'Чёрный',fur:'#585070',hi:'#7A7095',dark:'#3E3750',belly:'#6C6386',ear:'#EBA8BF',iris:'#E4F29A',iris2:'#8DB52F',pat:'none',line:'#2E2838',wh:'#E6E0F0'},
+  calico:{label:'Трёхцветный',fur:'#FFFBF5',hi:'#FFFFFF',dark:'#FFB46A',dark2:'#7A6A72',belly:'#FFFFFF',ear:'#FFBFCD',iris:'#A9DFA8',iris2:'#3E9B57',pat:'calico'},
+  siamese:{label:'Сиамский',fur:'#FAF0E2',hi:'#FFFBF4',dark:'#8E7262',belly:'#FFFBF4',ear:'#D6B3A0',iris:'#B4DCFC',iris2:'#3B82D0',pat:'points'}
+};
+function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const A=p(a),B=p(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+const HEAD='M100,31 C137,31 161,53 162,82 L171,95 L161,99 L167,111 L151,113 C139,131 121,138 100,138 C79,138 61,131 49,113 L33,111 L39,99 L29,95 L38,82 C39,53 63,31 100,31 Z';
+const BODY='M100,112 C134,112 155,140 154,170 C153,196 131,208 100,208 C69,208 47,196 46,170 C45,140 66,112 100,112 Z';
+const RUFF='M66,128 Q72,138 68,147 Q79,143 83,153 Q90,145 100,156 Q110,145 117,153 Q121,143 132,147 Q128,138 134,128 Q100,146 66,128 Z';
+const TAIL='M136,196 C180,198 190,158 172,124';
+const rg=(id,stops,o)=>{o=o||{};return `<radialGradient id="${id}" cx="${o.cx||'45%'}" cy="${o.cy||'35%'}" r="${o.r||'70%'}">${stops.map(s=>`<stop offset="${s[0]}" stop-color="${s[1]}"${s[2]!==undefined?` stop-opacity="${s[2]}"`:''}/>`).join('')}</radialGradient>`;};
+const lg=(id,stops,v)=>`<linearGradient id="${id}" x1="0" y1="0" x2="${v?0:1}" y2="${v?1:0}">${stops.map(s=>`<stop offset="${s[0]}" stop-color="${s[1]}"${s[2]!==undefined?` stop-opacity="${s[2]}"`:''}/>`).join('')}</linearGradient>`;
+function ensureDefs(){
+  if(document.getElementById('kdefs'))return;
+  let d='';
+  Object.keys(CATS).forEach(k=>{const c=CATS[k];
+    d+=rg(`cf-${k}`,[[0,c.hi],[.6,c.fur],[1,mix(c.fur,c.dark,.5)]]);
+    d+=rg(`cb-${k}`,[[0,mix(c.belly,'#FFFFFF',.45)],[.5,c.belly],[1,mix(c.belly,c.fur,.6)]],{cy:'30%'});
+    d+=rg(`ci-${k}`,[[0,c.iris],[.75,mix(c.iris,c.iris2,.6)],[1,c.iris2]],{cx:'50%',cy:'70%',r:'65%'});
+    d+=lg(`ce-${k}`,[[0,c.ear],[1,'#FFE6EE']],true);
+    d+=rg(`cp-${k}`,[[0,mix(c.dark,'#FFFFFF',.18)],[1,c.dark]]);
+    d+=rg(`cm-${k}`,[[0,c.dark,.95],[.6,c.dark,.75],[1,c.dark,0]],{cx:'50%',cy:'55%',r:'50%'});
+    d+=rg(`co-${k}`,[[0,mix(c.dark,'#FFFFFF',.15)],[1,c.dark]]);
+    if(c.dark2)d+=rg(`c2-${k}`,[[0,mix(c.dark2,'#FFFFFF',.15)],[1,c.dark2]]);
+  });
+  d+=rg('blush',[[0,'#FF8FB1',.75],[1,'#FF8FB1',0]],{cx:'50%',cy:'50%',r:'50%'});
+  d+=rg('gloss',[[0,'#FFFFFF',.9],[1,'#FFFFFF',0]],{cx:'50%',cy:'50%',r:'50%'});
+  d+=lg('gGold',[[0,'#FFF0A8'],[.5,'#FFD45E'],[1,'#F2AE3C']],true);
+  d+=rg('gGoldR',[[0,'#FFF6C8'],[.6,'#FFD45E'],[1,'#E9A132']],{cx:'38%',cy:'32%'});
+  d+=lg('gBow',[[0,'#FFC2D6'],[1,'#FF7FA8']],true);
+  d+=lg('gBlue',[[0,'#C9E2FF'],[1,'#86B8F5']],true);
+  d+=lg('gBlue2',[[0,'#9CC6F8'],[1,'#6F9FE6']],true);
+  d+=lg('gMint',[[0,'#C8F1E4'],[1,'#7FD0B8']],true);
+  d+=rg('gYarn',[[0,'#FFD0DA'],[.65,'#FF9CB2'],[1,'#E87894']],{cx:'38%',cy:'32%'});
+  d+=rg('gBall',[[0,'#E2F0FF'],[.6,'#A6CDFF'],[1,'#78A8EE']],{cx:'36%',cy:'30%'});
+  d+=rg('gMouse',[[0,'#F0EDF6'],[1,'#B9B1CB']],{cx:'40%',cy:'30%'});
+  d+=lg('gWood',[[0,'#F3D2A6'],[1,'#D9A874']],true);
+  d+=lg('gWoodD',[[0,'#D9A874'],[1,'#B98450']],true);
+  d+=lg('gCush',[[0,'#FFD3DF'],[1,'#FF9FBA']],true);
+  d+=lg('gBowlP',[[0,'#FFB6CB'],[1,'#F27FA3']],true);
+  d+=lg('gBowlB',[[0,'#B8D9FF'],[1,'#7DAAF0']],true);
+  d+=lg('gWall',[[0,'#FFF4DA'],[1,'#FFE2B0']],true);
+  d+=lg('gRoof',[[0,'#FFA9C2'],[1,'#F27FA3']],true);
+  d+=lg('gWin',[[0,'#FFF3B8'],[1,'#FFD36B']],true);
+  d+=lg('gPot',[[0,'#FFC0A2'],[1,'#F59474']],true);
+  d+=lg('gLeaf',[[0,'#BFF0C9'],[1,'#7CCB96']],true);
+  d+=lg('gSky',[[0,'#BFE0FF'],[1,'#E8F4FF']],true);
+  d+=lg('gRoomWall',[[0,'#FFF0F6'],[1,'#FBE3EE']],true);
+  d+=lg('gFloor',[[0,'#F8E3CC'],[1,'#EFCDAA']],true);
+  d+=lg('gCurtain',[[0,'#D9F3EA'],[1,'#A9E2CF']]);
+  d+=lg('gFish',[[0,'#A9DBFF'],[1,'#6FB4F0']],true);
+  d+=lg('gFishO',[[0,'#FFD8C2'],[1,'#FFA982']],true);
+  d+=`<pattern id="pScarf" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#FFA8BD"/><rect y="0" width="14" height="4.5" fill="#FFFFFF" opacity=".9"/><circle cx="7" cy="9.5" r="1.8" fill="#7FD0B8"/></pattern>`;
+  d+=`<pattern id="pWeave" width="12" height="10" patternUnits="userSpaceOnUse"><rect width="12" height="10" fill="#EBC08F"/><path d="M0,5 Q3,1 6,5 T12,5" fill="none" stroke="#C99A6B" stroke-width="2"/><path d="M0,10 Q3,6 6,10 T12,10" fill="none" stroke="#D9AD7C" stroke-width="1.4"/></pattern>`;
+  d+=`<pattern id="pWall" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M9,11 c-2,-3 -6,0 0,4 c6,-4 2,-7 0,-4z" fill="#F7C6D8"/><circle cx="26" cy="26" r="2.4" fill="#E2D6FA"/><circle cx="26" cy="9" r="1.2" fill="#CDEBDF"/></pattern>`;
+  d+=`<pattern id="pRug" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#FFD9E4"/><g fill="#FFFFFF" opacity=".95"><ellipse cx="11" cy="13" rx="3.4" ry="2.8"/><circle cx="7" cy="8.5" r="1.4"/><circle cx="10" cy="7" r="1.4"/><circle cx="13" cy="7" r="1.4"/><circle cx="16" cy="8.5" r="1.4"/></g></pattern>`;
+  d+=`<clipPath id="clipH"><path d="${HEAD}"/></clipPath><clipPath id="clipB"><path d="${BODY}"/></clipPath>`;
+  const el=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  el.setAttribute('id','kdefs');el.setAttribute('aria-hidden','true');el.setAttribute('width','0');el.setAttribute('height','0');
+  el.setAttribute('style','position:absolute;width:0;height:0;overflow:hidden');
+  el.innerHTML=`<defs>${d}</defs>`;document.body.insertBefore(el,document.body.firstChild);
+}
+function catInner(t,o){
+  o=o||{};if(!CATS[t])t='ginger';const c=CATS[t];const L=c.line||LINE;const sw=3;const wear=o.wear||{};const mood=o.mood||'normal';
+  const F=`url(#cf-${t})`,PT=`url(#cp-${t})`,pts=c.pat==='points';
+  const tail=pts?PT:F, paw=pts?PT:F;
+  const earL=pts?PT:(c.pat==='calico'?`url(#co-${t})`:F), earR=pts?PT:(c.pat==='calico'?`url(#c2-${t})`:F);
+  const wh=c.wh||L;
+  let s=`<ellipse cx="100" cy="211" rx="68" ry="8" fill="${LINE}" opacity=".13"/>`;
+  /* хвост */
+  s+=`<path d="${TAIL}" fill="none" stroke="${L}" stroke-width="22" stroke-linecap="round"/><path d="${TAIL}" fill="none" stroke="${pts?c.dark:c.fur}" stroke-width="15.5" stroke-linecap="round"/>`;
+  s+=`<path d="M141,193 C176,193 184,160 171,130" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".35"/>`;
+  if(c.pat==='tabby')s+=`<path d="M164,184 l7,8 M178,166 l9,3 M182,146 l9,-1 M177,128 l8,-4" stroke="${c.dark}" stroke-width="5.5" stroke-linecap="round"/>`;
+  if(c.pat==='calico')s+=`<path d="M176,140 C182,132 178,126 172,124" fill="none" stroke="${c.dark2}" stroke-width="13" stroke-linecap="round"/>`;
+  /* задние лапки */
+  s+=`<ellipse cx="56" cy="199" rx="17" ry="10.5" fill="${paw}" stroke="${L}" stroke-width="${sw}"/><ellipse cx="144" cy="199" rx="17" ry="10.5" fill="${paw}" stroke="${L}" stroke-width="${sw}"/>`;
+  /* тело */
+  s+=`<path d="${BODY}" fill="${F}" stroke="${L}" stroke-width="${sw}"/>`;
+  if(c.pat==='tabby')s+=`<g clip-path="url(#clipB)" stroke="${c.dark}" stroke-width="6" stroke-linecap="round" fill="none" opacity=".85"><path d="M44,146 q14,1 21,-8"/><path d="M43,164 q16,1 23,-8"/><path d="M46,182 q14,1 20,-6"/><path d="M156,146 q-14,1 -21,-8"/><path d="M157,164 q-16,1 -23,-8"/><path d="M154,182 q-14,1 -20,-6"/></g>`;
+  if(c.pat==='calico')s+=`<g clip-path="url(#clipB)"><path d="M128,122 C150,118 164,140 160,160 C150,166 134,160 128,148 C122,138 120,126 128,122Z" fill="url(#co-${t})"/><path d="M40,176 C50,168 68,172 70,186 C70,198 56,206 44,200Z" fill="url(#c2-${t})"/><circle cx="120" cy="190" r="6" fill="url(#co-${t})"/></g>`;
+  if(pts)s+=`<g clip-path="url(#clipB)"><ellipse cx="100" cy="210" rx="60" ry="14" fill="${c.dark}" opacity=".18"/></g>`;
+  s+=`<path d="${BODY}" fill="none" stroke="${L}" stroke-width="${sw}"/>`;
+  /* пушистая грудка */
+  s+=`<ellipse cx="100" cy="174" rx="31" ry="31" fill="url(#cb-${t})"/>`;
+  s+=`<path d="${RUFF}" fill="${c.belly}"/><path d="M84,166 q4,6 0,12 M100,170 q4,6 0,12 M116,166 q4,6 0,12" stroke="${mix(c.belly,c.dark,.35)}" stroke-width="2" fill="none" stroke-linecap="round" opacity=".55"/>`;
+  /* передние лапки с подушечками */
+  [79,121].forEach(x=>{s+=`<ellipse cx="${x}" cy="202" rx="17" ry="12" fill="${paw}" stroke="${L}" stroke-width="${sw}"/><path d="M${x-6},197 v6 M${x+6},197 v6" stroke="${L}" stroke-width="1.8" stroke-linecap="round" opacity=".4"/>`;
+    s+=`<g fill="#FF9DB8"><ellipse cx="${x}" cy="207" rx="5.5" ry="3.6"/><circle cx="${x-8}" cy="203.5" r="2.3"/><circle cx="${x+8}" cy="203.5" r="2.3"/></g><circle cx="${x-1.5}" cy="206" r="1.2" fill="#fff" opacity=".8"/>`;});
+  /* ошейник / шарфик */
+  if(wear.neck==='scarf')s+=`<path d="M45,121 Q100,150 155,121 L158,141 Q100,171 42,141 Z" fill="url(#pScarf)" stroke="${L}" stroke-width="2.6" stroke-linejoin="round"/><path d="M48,136 Q100,163 152,136" fill="none" stroke="#E46F95" stroke-width="2" opacity=".5"/><path d="M114,147 L133,190 L117,195 L102,151 Z" fill="url(#pScarf)" stroke="${L}" stroke-width="2.6" stroke-linejoin="round"/><path d="M118,195 l-1,8 M123,194 l0,8 M128,192 l1,8 M132,190 l2,7" stroke="#FF8FB1" stroke-width="3" stroke-linecap="round"/><path d="M106,150 l9,-4" stroke="${L}" stroke-width="2" opacity=".4"/>`;
+  if(wear.neck==='bell')s+=`<path d="M49,125 Q100,152 151,125 L151,137 Q100,164 49,137 Z" fill="url(#gMint)" stroke="${L}" stroke-width="2.6"/><g fill="#fff" opacity=".9"><circle cx="66" cy="136" r="1.8"/><circle cx="82" cy="142" r="1.8"/><circle cx="118" cy="142" r="1.8"/><circle cx="134" cy="136" r="1.8"/></g><circle cx="100" cy="148" r="3.2" fill="none" stroke="${L}" stroke-width="2"/><circle cx="100" cy="158" r="10.5" fill="url(#gGoldR)" stroke="${L}" stroke-width="2.6"/><path d="M92,160 h16" stroke="${L}" stroke-width="2.2" stroke-linecap="round"/><circle cx="100" cy="164" r="2" fill="${L}"/><ellipse cx="96" cy="154" rx="3" ry="2" fill="#fff" opacity=".85"/>`;
+  /* ушки */
+  s+=`<path d="M48,76 L45,18 Q47,9 56,14 L96,40 Z" fill="${earL}" stroke="${L}" stroke-width="${sw}" stroke-linejoin="round"/><path d="M152,76 L155,18 Q153,9 144,14 L104,40 Z" fill="${earR}" stroke="${L}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  s+=`<path d="M56,60 L54,26 Q55,22 59,24 L82,42 Z" fill="url(#ce-${t})"/><path d="M144,60 L146,26 Q145,22 141,24 L118,42 Z" fill="url(#ce-${t})"/>`;
+  s+=`<path d="M58,58 l5,-11 M63,60 l7,-9 M142,58 l-5,-11 M137,60 l-7,-9" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity=".9"/>`;
+  /* голова с пушистыми щёчками */
+  s+=`<path d="${HEAD}" fill="${F}" stroke="${L}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  if(c.pat==='tabby')s+=`<g clip-path="url(#clipH)" stroke="${c.dark}" stroke-linecap="round" fill="none" opacity=".9"><path d="M100,34 v17" stroke-width="5.5"/><path d="M86,37 q1,8 4,13" stroke-width="5"/><path d="M114,37 q-1,8 -4,13" stroke-width="5"/><path d="M30,84 l15,3 M30,98 l14,0" stroke-width="5"/><path d="M170,84 l-15,3 M170,98 l-14,0" stroke-width="5"/></g>`;
+  if(c.pat==='calico')s+=`<g clip-path="url(#clipH)"><path d="M30,60 C36,30 70,22 92,36 C96,50 88,66 70,70 C52,74 36,72 30,60Z" fill="url(#co-${t})"/><path d="M128,40 C150,36 170,52 170,72 C160,80 140,78 132,66 C126,56 124,46 128,40Z" fill="url(#c2-${t})"/></g>`;
+  if(pts)s+=`<g clip-path="url(#clipH)"><ellipse cx="100" cy="106" rx="46" ry="38" fill="url(#cm-${t})"/></g>`;
+  s+=`<path d="M50,64 Q70,38 100,36" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity=".35"/>`;
+  if(c.pat!=='none')s+=`<path d="${HEAD}" fill="none" stroke="${L}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  /* мордочка */
+  if(!pts)s+=`<ellipse cx="89" cy="111" rx="15" ry="11" fill="${c.belly}" opacity=".92"/><ellipse cx="111" cy="111" rx="15" ry="11" fill="${c.belly}" opacity=".92"/>`;
+  s+=`<ellipse cx="57" cy="108" rx="13" ry="8" fill="url(#blush)"/><ellipse cx="143" cy="108" rx="13" ry="8" fill="url(#blush)"/>`;
+  if(mood==='happy'){
+    [76,124].forEach(x=>{s+=`<path d="M${x-13},91 Q${x},74 ${x+13},91" fill="none" stroke="#2E2639" stroke-width="4.6" stroke-linecap="round"/>`;});
+    s+=`<path d="M60,74 l-3,-4 M140,74 l3,-4" stroke="#2E2639" stroke-width="2.4" stroke-linecap="round"/>`;
+  }else{
+    [76,124].forEach((x,i)=>{const out=i?1:-1;
+      s+=`<ellipse cx="${x}" cy="88" rx="14.5" ry="16.5" fill="url(#ci-${t})" stroke="#2E2639" stroke-width="2.4"/>`;
+      s+=`<ellipse cx="${x}" cy="90" rx="8.6" ry="12" fill="#2E2639"/>`;
+      s+=`<ellipse cx="${x+5}" cy="80.5" rx="5.4" ry="5.8" fill="#fff"/><circle cx="${x-4.5}" cy="96" r="2.5" fill="#fff" opacity=".92"/><circle cx="${x+7}" cy="93" r="1.3" fill="#fff" opacity=".8"/>`;
+      s+=`<path d="M${x-14.5},84 Q${x-12},70 ${x},71.5 Q${x+12},70 ${x+14.5},84" fill="none" stroke="#2E2639" stroke-width="3.4" stroke-linecap="round"/>`;
+      s+=`<path d="M${x+out*13.5},79 l${out*5},-4.5 M${x+out*14.5},84 l${out*6},-2" stroke="#2E2639" stroke-width="2.2" stroke-linecap="round"/>`;});
+  }
+  s+=`<path d="M92.5,104 Q100,99.5 107.5,104 Q104.5,111 100,112 Q95.5,111 92.5,104 Z" fill="#F98FAD" stroke="${L}" stroke-width="1.6" stroke-linejoin="round"/><ellipse cx="97.5" cy="104" rx="2.6" ry="1.4" fill="#fff" opacity=".85"/>`;
+  s+=mood==='happy'?`<path d="M89,115 Q100,133 111,115 Q100,119 89,115 Z" fill="#E9667F" stroke="${L}" stroke-width="2.2" stroke-linejoin="round"/><path d="M95,122.5 Q100,129 105,122.5 Q100,120 95,122.5Z" fill="#FFA3B6"/>`
+                  :`<path d="M100,112 q0,7 -7,7 q-4,0 -6,-3 M100,112 q0,7 7,7 q4,0 6,-3" stroke="${L}" stroke-width="2.3" fill="none" stroke-linecap="round"/>`;
+  s+=`<g stroke="${wh}" stroke-width="1.8" stroke-linecap="round" opacity=".5"><path d="M64,105 L31,98 M64,110 L30,112 M66,115 L36,124 M136,105 L169,98 M136,110 L170,112 M134,115 L164,124"/></g>`;
+  /* шапочки */
+  if(wear.head==='beanie')s+=`<path d="M32,64 Q28,0 100,2 Q172,0 168,64 Z" fill="url(#gBlue)" stroke="${L}" stroke-width="2.8" stroke-linejoin="round"/><g stroke="#FFFFFF" stroke-width="2.4" fill="none" opacity=".75" stroke-linecap="round"><path d="M60,58 Q58,30 72,12"/><path d="M80,56 Q80,26 88,6"/><path d="M100,56 V4"/><path d="M120,56 Q120,26 112,6"/><path d="M140,58 Q142,30 128,12"/></g><g fill="#FFFFFF" opacity=".9"><path d="M70,34 l3,4 l3,-4"/><path d="M98,26 l3,4 l3,-4"/><path d="M126,34 l3,4 l3,-4"/></g><path d="M31,50 Q100,34 169,50 L168,70 Q100,54 32,70 Z" fill="url(#gBlue2)" stroke="${L}" stroke-width="2.8" stroke-linejoin="round"/><path d="M44,64 l4,-12 M58,61 l4,-12 M72,59 l4,-12 M86,58 l4,-12 M100,57 l4,-12 M114,58 l4,-12 M128,59 l4,-12 M142,61 l4,-12 M156,64 l4,-12" stroke="#FFFFFF" stroke-width="2" opacity=".55" stroke-linecap="round"/><path d="M100,-12 l5,5 l7,-2 l1,7 l6,4 l-4,6 l3,7 l-7,2 l-2,7 l-7,-3 l-6,4 l-3,-7 l-7,-1 l2,-7 l-5,-5 l6,-4 l0,-7 l7,0 Z" fill="#FFFFFF" stroke="${L}" stroke-width="2.4" stroke-linejoin="round"/><circle cx="96" cy="-2" r="3.5" fill="#E8F2FF"/>`;
+  if(wear.head==='bow')s+=`<g transform="translate(142,40) rotate(20)"><path d="M-3,4 L-12,28 L-5,25 L-1,31 L1,6 Z" fill="url(#gBow)" stroke="${L}" stroke-width="2.2" stroke-linejoin="round"/><path d="M3,4 L13,27 L6,25 L3,31 L-1,6 Z" fill="url(#gBow)" stroke="${L}" stroke-width="2.2" stroke-linejoin="round"/><path d="M0,0 C-10,-19 -30,-12 -26,4 C-22,17 -7,9 0,0Z" fill="url(#gBow)" stroke="${L}" stroke-width="2.6" stroke-linejoin="round"/><path d="M0,0 C10,-19 30,-12 26,4 C22,17 7,9 0,0Z" fill="url(#gBow)" stroke="${L}" stroke-width="2.6" stroke-linejoin="round"/><path d="M-4,-1 C-10,-6 -16,-6 -19,-2 M4,-1 C10,-6 16,-6 19,-2" fill="none" stroke="#E46F95" stroke-width="1.8" stroke-linecap="round"/><g fill="#fff" opacity=".9"><circle cx="-16" cy="4" r="1.8"/><circle cx="-10" cy="-6" r="1.5"/><circle cx="16" cy="4" r="1.8"/><circle cx="11" cy="-7" r="1.5"/></g><path d="M-21,-6 Q-17,-11 -11,-10" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".95"/><ellipse rx="6.5" ry="7" fill="#FF6F9C" stroke="${L}" stroke-width="2.4"/><ellipse cx="-1.8" cy="-2.2" rx="2" ry="1.4" fill="#fff" opacity=".85"/></g>`;
+  if(wear.head==='crown')s+=`<path d="M70,44 L66,10 L86,26 L100,2 L114,26 L134,10 L130,44 Z" fill="url(#gGold)" stroke="${L}" stroke-width="2.6" stroke-linejoin="round"/><path d="M70,36 H130" stroke="#E9A132" stroke-width="2" opacity=".7"/><circle cx="66" cy="10" r="3.6" fill="#FFF0A8" stroke="${L}" stroke-width="1.8"/><circle cx="100" cy="2" r="3.6" fill="#FFF0A8" stroke="${L}" stroke-width="1.8"/><circle cx="134" cy="10" r="3.6" fill="#FFF0A8" stroke="${L}" stroke-width="1.8"/><ellipse cx="100" cy="31" rx="5" ry="6" fill="#FF8FB1" stroke="${L}" stroke-width="1.8"/><circle cx="84" cy="34" r="3.8" fill="#9CC9FF" stroke="${L}" stroke-width="1.6"/><circle cx="116" cy="34" r="3.8" fill="#8FD9C4" stroke="${L}" stroke-width="1.6"/><g fill="#fff"><circle cx="98.5" cy="29" r="1.6"/><circle cx="83" cy="33" r="1.1"/><circle cx="115" cy="33" r="1.1"/></g><path d="M76,30 L78,16" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".8"/><path d="M146,8 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 l5,-2 Z" fill="#FFD45E"/>`;
+  return s;
+}
+const catSVG=(t,o,cls)=>`<svg class="${cls||''}" viewBox="0 -14 200 234" role="img" aria-label="котик">${catInner(t,o)}</svg>`;
+const FISH=`<svg viewBox="0 0 40 24" aria-hidden="true"><path d="M3,12 Q14,0 27,6 L38,0 L35,12 L38,24 L27,18 Q14,24 3,12Z" fill="url(#gFish)" stroke="${LINE}" stroke-width="2" stroke-linejoin="round"/><path d="M17,8 q3,4 0,8" fill="none" stroke="${LINE}" stroke-width="1.4" opacity=".5"/><circle cx="10" cy="10.5" r="2.4" fill="${LINE}"/><circle cx="10.8" cy="9.6" r=".9" fill="#fff"/></svg>`;
+
+/* ---------- предметы ---------- */
+const L_=LINE;
+const SH=(cx,cy,rx)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${Math.max(3,rx*.16)}" fill="${L_}" opacity=".13"/>`;
+const IT={
+  bow:{c:'head',n:'Бантик',p:6},beanie:{c:'head',n:'Шапочка с помпоном',p:10},crown:{c:'head',n:'Корона',p:25},
+  scarf:{c:'neck',n:'Шарфик',p:8},bell:{c:'neck',n:'Ошейник с колокольчиком',p:6},
+  yarn:{c:'toy',n:'Клубок',p:5,d:()=>`${SH(52,90,32)}<path d="M76,74 Q92,82 86,92 Q80,99 95,97" stroke="#E87894" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="50" cy="58" r="30" fill="url(#gYarn)" stroke="${L_}" stroke-width="3"/><g stroke="#E06F8A" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".85"><path d="M24,46 Q50,30 76,48"/><path d="M21,60 Q50,42 79,62"/><path d="M28,76 Q52,60 74,80"/><path d="M38,30 Q30,58 44,86"/><path d="M62,30 Q72,56 60,87"/></g><path d="M32,44 Q38,36 46,34" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" opacity=".8"/>`},
+  mouse:{c:'toy',n:'Мышка',p:5,d:()=>`${SH(50,82,38)}<path d="M84,72 Q102,64 96,46 Q93,38 99,32" stroke="#F48FA8" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M12,74 Q14,38 50,38 Q84,40 88,74 Z" fill="url(#gMouse)" stroke="${L_}" stroke-width="3" stroke-linejoin="round"/><path d="M30,72 q20,-6 46,0" stroke="${L_}" stroke-width="1.8" stroke-dasharray="3 4" fill="none" opacity=".45"/><circle cx="38" cy="38" r="12" fill="#F7C3D3" stroke="${L_}" stroke-width="3"/><circle cx="38" cy="39" r="6" fill="#FF9DB8"/><circle cx="26" cy="56" r="3.6" fill="${L_}"/><circle cx="27.2" cy="54.8" r="1.2" fill="#fff"/><circle cx="12" cy="70" r="4.4" fill="#FF8FB1" stroke="${L_}" stroke-width="1.8"/><path d="M14,66 l-10,-6 M14,70 l-12,0" stroke="${L_}" stroke-width="1.4" opacity=".5"/><path d="M52,46 Q64,44 72,52" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>`},
+  ball:{c:'toy',n:'Мячик',p:6,d:()=>`${SH(50,90,32)}<circle cx="50" cy="58" r="30" fill="url(#gBall)"/><path d="M21,50 Q50,66 79,50" stroke="#FFD45E" stroke-width="8" fill="none"/><path d="M24,70 Q50,84 76,70" stroke="#FF9DB8" stroke-width="6" fill="none"/><circle cx="50" cy="58" r="30" fill="none" stroke="${L_}" stroke-width="3"/><g fill="#fff"><circle cx="38" cy="58" r="2"/><circle cx="56" cy="61" r="2"/><circle cx="66" cy="56" r="2"/></g><ellipse cx="38" cy="40" rx="8" ry="5" fill="#fff" opacity=".8" transform="rotate(-25 38 40)"/>`},
+  rod:{c:'toy',n:'Удочка-дразнилка',p:9,d:()=>`<path d="M14,96 L66,10" stroke="url(#gWoodD)" stroke-width="7" stroke-linecap="round"/><path d="M16,92 L28,72" stroke="#FF8FB1" stroke-width="8" stroke-linecap="round"/><path d="M66,10 Q90,26 82,56" stroke="${L_}" stroke-width="1.8" fill="none"/><ellipse cx="78" cy="68" rx="7" ry="15" fill="#FF9DB8" stroke="${L_}" stroke-width="2.4" transform="rotate(-24 78 68)"/><path d="M80,58 L75,80" stroke="#fff" stroke-width="1.6" transform="rotate(-24 78 68)"/><ellipse cx="88" cy="70" rx="6" ry="14" fill="#8FD9C4" stroke="${L_}" stroke-width="2.4" transform="rotate(20 88 70)"/><ellipse cx="83" cy="76" rx="5" ry="12" fill="#FFD45E" stroke="${L_}" stroke-width="2.2"/><circle cx="82" cy="57" r="4.5" fill="url(#gGoldR)" stroke="${L_}" stroke-width="2"/>`},
+  cushion:{c:'bed',n:'Подушка',p:8,d:()=>`${SH(50,94,44)}<path d="M8,56 Q4,52 10,48 Q50,40 90,48 Q96,52 92,56 L94,84 Q96,90 88,92 Q50,98 12,92 Q4,90 6,84 Z" fill="url(#gCush)" stroke="${L_}" stroke-width="3" stroke-linejoin="round"/><path d="M8,52 Q6,58 10,62 M92,52 Q94,58 90,62 M8,86 q-4,4 -2,8 M92,86 q4,4 2,8" stroke="${L_}" stroke-width="2" fill="none" opacity=".5"/><g fill="#E46F95"><circle cx="30" cy="70" r="3.4"/><circle cx="50" cy="68" r="3.4"/><circle cx="70" cy="70" r="3.4"/></g><path d="M30,70 Q40,62 50,68 Q60,62 70,70" stroke="#E46F95" stroke-width="1.6" fill="none" opacity=".5"/><path d="M18,54 Q34,48 50,48" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" opacity=".75"/>`},
+  basket:{c:'bed',n:'Лежанка-корзинка',p:12,d:()=>`${SH(50,96,46)}<path d="M4,58 Q6,94 50,94 Q94,94 96,58 Z" fill="url(#pWeave)" stroke="${L_}" stroke-width="3" stroke-linejoin="round"/><ellipse cx="50" cy="58" rx="45" ry="12" fill="url(#gWoodD)" stroke="${L_}" stroke-width="3"/><ellipse cx="50" cy="57" rx="36" ry="8" fill="url(#gBlue)" stroke="${L_}" stroke-width="2"/><g fill="#fff" opacity=".9"><circle cx="34" cy="56" r="1.6"/><circle cx="50" cy="54" r="1.6"/><circle cx="66" cy="56" r="1.6"/><circle cx="42" cy="60" r="1.6"/><circle cx="58" cy="60" r="1.6"/></g><path d="M86,60 q8,-2 10,6 q-6,6 -10,0" fill="#FF8FB1" stroke="${L_}" stroke-width="2"/>`},
+  house:{c:'bed',n:'Домик с окошком',p:20,d:()=>`${SH(50,96,44)}<rect x="62" y="10" width="11" height="22" rx="2" fill="url(#gWoodD)" stroke="${L_}" stroke-width="2.4"/><path d="M67.5,8 c-2,-3 -6,0 0,4 c6,-4 2,-7 0,-4z" fill="#FF8FB1"/><rect x="16" y="42" width="68" height="52" rx="6" fill="url(#gWall)" stroke="${L_}" stroke-width="3"/><path d="M16,56 H84 M16,70 H84 M16,84 H84" stroke="#F2C98A" stroke-width="1.6"/><path d="M6,48 L50,8 L94,48 Q92,53 87,51 L50,18 L13,51 Q8,53 6,48 Z" fill="url(#gRoof)" stroke="${L_}" stroke-width="3" stroke-linejoin="round"/><path d="M22,40 q6,4 12,0 M34,30 q6,4 12,0 M54,30 q6,4 12,0 M66,40 q6,4 12,0" stroke="#fff" stroke-width="2" fill="none" opacity=".7"/><rect x="58" y="52" width="18" height="16" rx="3" fill="url(#gWin)" stroke="${L_}" stroke-width="2.4"/><path d="M67,52 V68 M58,60 H76" stroke="${L_}" stroke-width="1.8"/><path d="M58,52 q4,6 0,12 M76,52 q-4,6 0,12" fill="#BDEBDC" opacity=".9"/><path d="M24,94 V72 a14,14 0 0 1 28,0 V94Z" fill="#6B5B78" stroke="${L_}" stroke-width="3"/><path d="M27,94 Q26,84 38,84 Q50,84 49,94Z" fill="url(#gCush)" stroke="${L_}" stroke-width="1.8"/><circle cx="33" cy="89" r="1.4" fill="#E46F95"/><circle cx="43" cy="89" r="1.4" fill="#E46F95"/><path d="M50,30 c-4,-5 -10,0 0,7 c10,-7 4,-12 0,-7z" fill="#fff"/>`},
+  'bowl-pink':{c:'bowl',n:'Розовая миска',p:4,d:()=>`${SH(50,94,42)}<path d="M10,56 L90,56 Q86,92 50,92 Q14,92 10,56Z" fill="url(#gBowlP)" stroke="${L_}" stroke-width="3" stroke-linejoin="round"/><path d="M38,78 c-3,-4 -8,0 0,5 c8,-5 3,-9 0,-5z M62,78 c-3,-4 -8,0 0,5 c8,-5 3,-9 0,-5z" fill="#fff" opacity=".85"/><ellipse cx="50" cy="56" rx="40" ry="9" fill="#FFE0EA" stroke="${L_}" stroke-width="3"/><g fill="url(#gWoodD)" stroke="${L_}" stroke-width="1.2"><circle cx="38" cy="54" r="4.2"/><circle cx="50" cy="51" r="4.2"/><circle cx="61" cy="55" r="4.2"/><circle cx="45" cy="57" r="3.6"/></g><path d="M18,64 Q22,80 34,86" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".6"/>`},
+  'bowl-fish':{c:'bowl',n:'Миска с рыбкой',p:7,d:()=>`${SH(50,96,42)}<path d="M10,60 L90,60 Q86,94 50,94 Q14,94 10,60Z" fill="url(#gBowlB)" stroke="${L_}" stroke-width="3" stroke-linejoin="round"/><ellipse cx="50" cy="60" rx="40" ry="9" fill="#E4F0FF" stroke="${L_}" stroke-width="3"/><path d="M24,46 Q42,28 62,38 L77,30 L73,45 L77,60 L62,52 Q42,62 24,46Z" fill="url(#gFishO)" stroke="${L_}" stroke-width="3" stroke-linejoin="round"/><path d="M48,36 q4,9 0,18" stroke="${L_}" stroke-width="1.6" fill="none" opacity=".5"/><circle cx="34" cy="43" r="3" fill="${L_}"/><circle cx="35" cy="42" r="1.1" fill="#fff"/><path d="M18,68 Q22,82 34,88" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".6"/>`},
+  scratch:{c:'decor',n:'Когтеточка',p:12,d:()=>`${SH(50,96,40)}<rect x="12" y="84" width="76" height="12" rx="5" fill="url(#gWoodD)" stroke="${L_}" stroke-width="3"/><rect x="38" y="18" width="24" height="68" fill="#F4D9B0" stroke="${L_}" stroke-width="3"/><path d="M38,26 l24,6 M38,36 l24,6 M38,46 l24,6 M38,56 l24,6 M38,66 l24,6 M38,76 l24,6" stroke="#CFA06E" stroke-width="2.6"/><rect x="16" y="8" width="68" height="12" rx="6" fill="url(#gCush)" stroke="${L_}" stroke-width="3"/><path d="M76,20 v24" stroke="${L_}" stroke-width="1.8"/><circle cx="76" cy="50" r="6.5" fill="url(#gGoldR)" stroke="${L_}" stroke-width="2.4"/><path d="M24,12 h22" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>`},
+  rug:{c:'decor',n:'Коврик с лапками',p:7,d:()=>`<ellipse cx="50" cy="60" rx="47" ry="25" fill="url(#gMint)" stroke="${L_}" stroke-width="3"/><ellipse cx="50" cy="60" rx="38" ry="18" fill="url(#pRug)"/><ellipse cx="50" cy="60" rx="38" ry="18" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 4"/>`},
+  plant:{c:'decor',n:'Цветок в горшке',p:8,d:()=>`${SH(50,97,22)}<ellipse cx="33" cy="40" rx="10" ry="24" fill="url(#gLeaf)" stroke="${L_}" stroke-width="2.8" transform="rotate(-32 33 40)"/><ellipse cx="67" cy="40" rx="10" ry="24" fill="url(#gLeaf)" stroke="${L_}" stroke-width="2.8" transform="rotate(32 67 40)"/><path d="M33,40 L44,58 M67,40 L56,58" stroke="#5DAF7A" stroke-width="1.6" opacity=".7"/><path d="M50,58 V22" stroke="#6FBF88" stroke-width="4"/><g fill="#FFB0C6" stroke="${L_}" stroke-width="2"><circle cx="50" cy="8" r="6.5"/><circle cx="58" cy="15" r="6.5"/><circle cx="55" cy="24" r="6.5"/><circle cx="45" cy="24" r="6.5"/><circle cx="42" cy="15" r="6.5"/></g><circle cx="50" cy="17" r="5" fill="url(#gGoldR)" stroke="${L_}" stroke-width="1.8"/><path d="M28,58 H72 L66,97 H34 Z" fill="url(#gPot)" stroke="${L_}" stroke-width="3" stroke-linejoin="round"/><rect x="25" y="56" width="50" height="9" rx="3" fill="#FFB596" stroke="${L_}" stroke-width="2.6"/><g fill="#fff" opacity=".85"><circle cx="42" cy="78" r="2"/><circle cx="50" cy="84" r="2"/><circle cx="58" cy="78" r="2"/></g>`},
+  picture:{c:'decor',n:'Картина с рыбкой',p:10,d:()=>`<path d="M36,16 L50,4 L64,16" stroke="${L_}" stroke-width="2.4" fill="none"/><circle cx="50" cy="4" r="2.6" fill="${L_}"/><rect x="8" y="16" width="84" height="64" rx="8" fill="url(#gGold)" stroke="${L_}" stroke-width="3"/><rect x="17" y="25" width="66" height="46" rx="5" fill="url(#gSky)" stroke="#E9A132" stroke-width="1.6"/><path d="M17,62 Q30,56 42,62 T66,62 T83,60 V71 H17Z" fill="#A9E2CF" opacity=".9"/><path d="M28,46 Q42,32 58,40 L70,32 L68,46 L70,60 L58,52 Q42,60 28,46Z" fill="url(#gFishO)" stroke="${L_}" stroke-width="2.4" stroke-linejoin="round"/><circle cx="37" cy="44" r="2.6" fill="${L_}"/><circle cx="37.8" cy="43.2" r=".9" fill="#fff"/><g fill="#fff" stroke="#9CC9FF" stroke-width="1.2"><circle cx="24" cy="36" r="2.6"/><circle cx="28" cy="30" r="1.8"/></g><path d="M12,22 h14" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>`}
+};
+const IT_ORDER=['bow','beanie','crown','scarf','bell','yarn','mouse','ball','rod','cushion','basket','house','bowl-pink','bowl-fish','scratch','rug','plant','picture'];
+const TABS=[{id:'wear',n:'Одежда',c:['head','neck']},{id:'toy',n:'Игрушки',c:['toy']},{id:'home',n:'Лежанки и миски',c:['bed','bowl']},{id:'decor',n:'Для комнаты',c:['decor']}];
+function itemIcon(id){const it=IT[id];if(it.c==='head'||it.c==='neck'){const w={};w[it.c]=id;return `<svg class="ic" viewBox="0 -14 200 234" aria-hidden="true">${catInner(S.cat||'ginger',{wear:w})}</svg>`;}return `<svg class="ic" viewBox="0 0 100 100" aria-hidden="true">${it.d()}</svg>`;}
+function isOn(id){const it=IT[id];if(it.c==='head'||it.c==='neck')return S.wear[it.c]===id;if(it.c==='bed')return S.bed===id;if(it.c==='bowl')return S.bowl===id;return !!S.on[id];}
+function toggle(id){const it=IT[id];const on=isOn(id);if(it.c==='head'||it.c==='neck')S.wear[it.c]=on?null:id;else if(it.c==='bed')S.bed=on?null:id;else if(it.c==='bowl')S.bowl=on?null:id;else S.on[id]=!on;save();}
+
+function roomSVG(mood){
+  const put=(id,x,y,s)=>`<g transform="translate(${x},${y}) scale(${s})">${IT[id].d()}</g>`;
+  let s=`<svg class="room" viewBox="0 0 400 300" role="img" aria-label="Комната котика">`;
+  s+=`<rect width="400" height="206" fill="url(#gRoomWall)"/><rect width="400" height="206" fill="url(#pWall)"/>`;
+  s+=`<rect x="0" y="196" width="400" height="12" fill="#F4CADB"/><rect x="0" y="196" width="400" height="3" fill="#fff" opacity=".6"/><rect x="0" y="206" width="400" height="94" fill="url(#gFloor)"/><path d="M0,238 H400 M0,270 H400 M90,206 v32 M240,206 v32 M160,238 v32 M320,238 v32 M60,270 v30 M210,270 v30 M350,270 v30" stroke="#E6C29D" stroke-width="2"/>`;
+  /* окно со шторками и подоконником */
+  s+=`<rect x="30" y="26" width="104" height="86" rx="14" fill="url(#gSky)" stroke="#fff" stroke-width="7"/><circle cx="108" cy="50" r="11" fill="#FFF1C7"/><circle cx="108" cy="50" r="16" fill="#FFF1C7" opacity=".35"/><path d="M40,98 q8,-10 18,-4 q8,-8 16,2 q8,0 8,8 h-42z" fill="#fff"/><path d="M82,32 V108 M30,70 H134" stroke="#fff" stroke-width="5"/>`;
+  s+=`<path d="M20,18 H144" stroke="url(#gWoodD)" stroke-width="6" stroke-linecap="round"/><path d="M22,20 Q30,60 22,118 Q36,120 44,112 Q34,70 44,20Z" fill="url(#gCurtain)" stroke="${LINE}" stroke-width="2"/><path d="M142,20 Q134,60 142,118 Q128,120 120,112 Q130,70 120,20Z" fill="url(#gCurtain)" stroke="${LINE}" stroke-width="2"/><path d="M30,30 Q34,66 30,106 M134,30 Q130,66 134,106" stroke="#fff" stroke-width="2" fill="none" opacity=".7"/><rect x="22" y="112" width="120" height="9" rx="4" fill="url(#gWood)" stroke="${LINE}" stroke-width="2"/>`;
+  /* полочка с рыбкой */
+  s+=`<rect x="184" y="80" width="56" height="7" rx="3" fill="url(#gWood)" stroke="${LINE}" stroke-width="2"/><g transform="translate(192,64) scale(.9)">${FISH.replace('<svg viewBox="0 0 40 24" aria-hidden="true">','').replace('</svg>','')}</g><circle cx="230" cy="72" r="7" fill="url(#gYarn)" stroke="${LINE}" stroke-width="1.8"/>`;
+  if(S.on.picture)s+=put('picture',262,24,.78);
+  if(S.on.rug)s+=`<g transform="translate(108,224) scale(1.84,.92)">${IT.rug.d()}</g>`;
+  if(S.on.plant)s+=put('plant',334,126,.72);
+  if(S.on.scratch)s+=put('scratch',268,120,.9);
+  if(S.bed)s+=put(S.bed,12,190,1.04);
+  if(S.on.rod)s+=put('rod',232,150,.62);
+  s+=`<g transform="translate(140,152) scale(.6)">${catInner(S.cat||'ginger',{wear:S.wear,mood:mood})}</g>`;
+  if(S.bowl)s+=put(S.bowl,286,236,.56);
+  if(S.on.yarn)s+=put('yarn',100,248,.42);
+  if(S.on.ball)s+=put('ball',248,254,.38);
+  if(S.on.mouse)s+=put('mouse',348,260,.4);
+  return s+`</svg>`;
+}
+/* ---------- схемы ---------- */
+const COL=['#FFC2D4','#B8E8D8','#FFE3A3','#DDEBFF'];
+const qv=v=>v==='?';
+const T_=(x,y,txt,o)=>{o=o||{};return `<text x="${x}" y="${y}" text-anchor="${o.a||'middle'}" font-family="Nunito,sans-serif" font-weight="${o.w||800}" font-size="${o.s||18}" fill="${o.q?'#E0457E':(o.c||LINE)}">${esc(txt)}</text>`;};
+function mParts(m){
+  const W=320,x0=10,y=34,h=40;const ws=m.parts.map(p=>p.w);const tot=ws.reduce((a,b)=>a+b,0);
+  let adj=ws.map(w=>Math.max(w,tot*.22));const at=adj.reduce((a,b)=>a+b,0);adj=adj.map(w=>w*W/at);
+  let s=`<svg viewBox="0 0 340 128" aria-label="схема: части и целое">`;let x=x0;
+  m.parts.forEach((p,i)=>{s+=`<rect x="${x}" y="${y}" width="${adj[i]}" height="${h}" rx="8" fill="${COL[i%4]}" stroke="${LINE}" stroke-width="2.6"/>`;s+=T_(x+adj[i]/2,y+h/2+7,p.v,{s:22,q:qv(p.v)});s+=T_(x+adj[i]/2,y-9,p.lab,{s:15,w:700});x+=adj[i];});
+  const e=x0+W,mid=x0+W/2;s+=`<path d="M${x0},${y+h+6} q0,10 10,10 H${mid-10} q10,0 10,10 q0,-10 10,-10 H${e-10} q10,0 10,-10" fill="none" stroke="${LINE}" stroke-width="2.4"/>`;
+  s+=T_(mid,y+h+46,`${m.total.lab}: ${m.total.v}`,{s:19,q:qv(m.total.v)});return s+`</svg>`;
+}
+function mCompare(m){
+  const W=250,x0=80,mx=Math.max(...m.rows.map(r=>r.w));const sc=w=>Math.max(30,W*w/mx);
+  const H=30+m.rows.length*56;let s=`<svg viewBox="0 0 340 ${H+8}" aria-label="схема: сравнение">`;
+  m.rows.forEach((r,i)=>{const y=14+i*56,w=sc(r.w);s+=T_(x0-8,y+27,r.lab,{a:'end',s:16,w:800});s+=`<rect x="${x0}" y="${y}" width="${w}" height="38" rx="8" fill="${COL[i]}" stroke="${LINE}" stroke-width="2.6"/>`;s+=T_(x0+w/2,y+26,r.v,{s:21,q:qv(r.v)});
+    if(m.diff&&r.w<mx){const dw=sc(mx)-w;s+=`<rect x="${x0+w}" y="${y}" width="${dw}" height="38" rx="8" fill="none" stroke="#E0457E" stroke-width="2.4" stroke-dasharray="6 5"/>`;s+=T_(x0+w+dw/2,y+26,(m.diff.pre||'')+m.diff.v,{s:17,q:true});}});
+  s+=`<path d="M${x0+sc(mx)},6 V${H}" stroke="${LINE}" stroke-width="1.5" stroke-dasharray="4 5" opacity=".5"/>`;return s+`</svg>`;
+}
+function mGroups(m){
+  const k=m.k,cols=Math.min(k,3),rows=Math.ceil(k/3);const bw=m.unknown==='per'?46:cols*17+14,bh=m.unknown==='per'?46:rows*17+14;
+  let shown=m.unknown==='groups'?Math.min(m.n,2):m.n;const items=[];for(let i=0;i<shown;i++)items.push('box');if(m.unknown==='groups')items.push('dots');if(m.left)items.push('left');
+  const W=330;let x=6,y=34,lineH=bh+14,out='';
+  items.forEach(t=>{const w=t==='box'?bw:(t==='dots'?40:56);if(x+w>W){x=6;y+=lineH;}
+    if(t==='box'){out+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="12" fill="#FFF7E6" stroke="${LINE}" stroke-width="2.4"/>`;
+      if(m.unknown==='per')out+=T_(x+bw/2,y+bh/2+8,'?',{s:24,q:true});else for(let j=0;j<k;j++){const cx=x+15+(j%3)*17,cy=y+15+Math.floor(j/3)*17;out+=`<circle cx="${cx}" cy="${cy}" r="6.5" fill="${m.color||'#7FC4F5'}" stroke="${LINE}" stroke-width="1.6"/>`;}}
+    else if(t==='dots'){out+=T_(x+20,y+bh/2+8,'…',{s:30});}
+    else{out+=`<rect x="${x}" y="${y}" width="56" height="${bh}" rx="12" fill="none" stroke="#E0457E" stroke-width="2.4" stroke-dasharray="6 5"/>`;out+=T_(x+28,y+bh/2+8,'?',{s:22,q:true});out+=T_(x+28,y+bh+16,'остаток',{s:13,w:700});}
+    x+=w+10;});
+  const H=y+bh+(m.left?26:14)+26;let s=`<svg viewBox="0 0 340 ${H}" aria-label="схема: равные группы">`;
+  s+=T_(6,22,m.top,{a:'start',s:17,q:/\?/.test(m.top)});s+=out;s+=T_(6,H-8,m.bottom,{a:'start',s:17,q:/\?/.test(m.bottom)});return s+`</svg>`;
+}
+function mTable(m){let s=`<table class="mtable"><tr>${['Цена','Количество','Стоимость'].map(h=>`<th>${h}</th>`).join('')}</tr>`;m.rows.forEach(r=>{s+=`<tr>${r.map(c=>`<td class="${c==='?'?'qq':''}">${esc(c)}</td>`).join('')}</tr>`;});return s+`</table>`;}
+function renderModel(m){if(!m)return '';if(m.type==='combo')return `<div class="combo">${m.items.map((x,i)=>`<div><div class="cap">${i===0?'Сначала':'Потом'}</div>${renderModel(x)}</div>`).join('')}</div>`;
+  return `<div class="model">${m.type==='parts'?mParts(m):m.type==='compare'?mCompare(m):m.type==='groups'?mGroups(m):mTable(m)}</div>`;}
+const MINI={
+  parts:`<svg viewBox="0 0 160 70"><rect x="8" y="12" width="84" height="24" rx="6" fill="#FFC2D4" stroke="${LINE}" stroke-width="2.4"/><rect x="92" y="12" width="60" height="24" rx="6" fill="#B8E8D8" stroke="${LINE}" stroke-width="2.4"/><path d="M8,42 q0,8 8,8 H72 q8,0 8,8 q0,-8 8,-8 H144 q8,0 8,-8" fill="none" stroke="${LINE}" stroke-width="2.2"/></svg>`,
+  compare:`<svg viewBox="0 0 160 70"><rect x="8" y="8" width="140" height="22" rx="6" fill="#FFC2D4" stroke="${LINE}" stroke-width="2.4"/><rect x="8" y="40" width="90" height="22" rx="6" fill="#B8E8D8" stroke="${LINE}" stroke-width="2.4"/><rect x="98" y="40" width="50" height="22" rx="6" fill="none" stroke="#E0457E" stroke-width="2.2" stroke-dasharray="5 4"/></svg>`,
+  groups:`<svg viewBox="0 0 160 70">${[8,60,112].map(x=>`<rect x="${x}" y="14" width="42" height="42" rx="10" fill="#FFF7E6" stroke="${LINE}" stroke-width="2.4"/>${[0,1,2,3].map(j=>`<circle cx="${x+13+(j%2)*16}" cy="${27+Math.floor(j/2)*16}" r="5.5" fill="#7FC4F5" stroke="${LINE}" stroke-width="1.4"/>`).join('')}`).join('')}</svg>`,
+  table:`<svg viewBox="0 0 160 70"><rect x="8" y="8" width="144" height="54" rx="8" fill="#fff" stroke="${LINE}" stroke-width="2.4"/><rect x="9.5" y="9.5" width="141" height="18" rx="6" fill="#FFF1C7"/><path d="M56,8 V62 M104,8 V62 M8,28 H152" stroke="${LINE}" stroke-width="2"/>${T_(32,23,'Ц',{s:14})}${T_(80,23,'К',{s:14})}${T_(128,23,'С',{s:14})}${T_(128,52,'?',{s:18,q:true})}</svg>`
+};
+const SNAME={parts:'Части и целое',compare:'Сравнение',groups:'Равные группы',table:'Цена, количество, стоимость'};
+function schemeLabel(id){const p=id.split('>');return p.length===1?SNAME[id]:`${SNAME[p[0]]}, потом ${SNAME[p[1]].toLowerCase()}`;}
+function schemeMini(id){const p=id.split('>');return p.length===1?MINI[id]:`<div class="row" style="justify-content:center;gap:4px;flex-wrap:nowrap"><div style="width:46%">${MINI[p[0]]}</div><b>→</b><div style="width:46%">${MINI[p[1]]}</div></div>`;}
+const SHINT={parts:'Здесь что-то добавили или убрали? Есть части и есть всё вместе (целое)?',compare:'Здесь сравнивают: у кого больше, у кого меньше, на сколько?',groups:'Здесь есть одинаковые кучки, по сколько-то в каждой?',table:'Здесь есть цена, количество и стоимость (сколько стоит всё)?'};
+
+/* ---------- персонажи ---------- */
+const CH=[{nom:'Барсик',gen:'Барсика',acc:'Барсика',dat:'Барсику',f:0},{nom:'Мурка',gen:'Мурки',acc:'Мурку',dat:'Мурке',f:1},{nom:'Пушок',gen:'Пушка',acc:'Пушка',dat:'Пушку',f:0},{nom:'Снежинка',gen:'Снежинки',acc:'Снежинку',dat:'Снежинке',f:1},{nom:'Рыжик',gen:'Рыжика',acc:'Рыжика',dat:'Рыжику',f:0},{nom:'Соня',gen:'Сони',acc:'Соню',dat:'Соне',f:1}];
+const he=c=>c.f?'она':'он';
+const oth=c=>pick(CH.filter(x=>x!==c));
+const RT='Как рассказать задачу своими словами?';
+const vb=(c,m,f)=>c.f?f:m;
+const two=()=>{const a=shuffle(CH);return[a[0],a[1]];};
+const okAdj=n=>n%10!==1||n%100===11; /* для «5 рыжих», а не «21 рыжих» */
+
+/* ---------- генераторы задач ----------
+   Каждая задача: cond, ask, known[{v,t}] (по порядку чисел в тексте), wrongQ, scheme, model,
+   steps[{label,op,a,b,res,rem?,unit,remUnit?,hints}], answer, check{text,expr,val}, sense */
+const ST=(label,op,a,b,res,unit,hints,extra)=>Object.assign({label,op,a,b,res,unit,hints},extra||{});
+const GEN={
+1:[
+ ()=>{const c=pick(CH),a=R(12,60),b=R(5,Math.min(35,100-a)),r=a+b,v=vb(c,'поймал','поймала');
+  return{rq:[['Про кого задача?',`Про ${c.acc} и рыбок`,`Про ${oth(c).acc} и клубки`,'Про котят в приюте'],[RT,`У ${c.gen} были рыбки. Потом ${he(c)} ${v} ещё. Надо узнать, сколько рыбок стало.`,`У ${c.gen} были рыбки, часть ${he(c)} съел${c.f?'а':''}. Надо узнать, сколько рыбок осталось.`,`${c.nom} ${v} рыбок. Надо узнать, сколько рыбок было сначала.`]],cond:`У ${c.gen} было ${N(a)} ${pw(a,'fish')}. Потом ${c.nom} ${v} ещё ${N(b)} ${pw(b,'fishAcc')}.`,ask:`Сколько рыбок стало у ${c.gen}?`,
+  known:[{v:a,t:'было рыбок'},{v:b,t:`${v} ещё`}],wrongQ:[`Сколько рыбок было у ${c.gen} сначала?`,`Сколько рыбок ${c.nom} ${v} потом?`],scheme:'parts',
+  model:{type:'parts',parts:[{v:a,w:a,lab:'было'},{v:b,w:b,lab:'ещё'}],total:{v:'?',lab:'стало'}},
+  steps:[ST('сколько рыбок стало','+',a,b,r,pw(r,'fish'),['Рыбок стало больше, чем было, или меньше?','Ищем целое — всё вместе. Чтобы найти целое, части складывают.'])],
+  answer:`${r} ${pw(r,'fish')}`,check:{text:'Уберём пойманных рыбок — должно остаться столько, сколько было.',expr:`${r} − ${b}`,val:a},sense:`${r} больше, чем ${a}. Так и должно быть: рыбок прибавилось.`};},
+ ()=>{const a=R(20,90),b=R(5,a-5),r=a-b;
+  return{rq:[['Про что задача?','Про клубки в корзинке','Про рыбок в миске','Про мячики в коробке'],[RT,'В корзинке лежали клубки. Котята часть укатили. Надо узнать, сколько клубков осталось.','В корзинку положили ещё клубков. Надо узнать, сколько клубков стало.','Котята укатили клубки. Надо узнать, сколько клубков они укатили.']],cond:`Сначала в корзинке ${N(a)} ${pw(a,'yarn')}. Котята укатили ${N(b)} ${pw(b,'yarn')}.`,ask:'Сколько клубков осталось в корзинке?',
+  known:[{v:a,t:'столько клубков лежало'},{v:b,t:'столько укатили'}],wrongQ:['Сколько клубков лежало в корзинке сначала?','Сколько клубков укатили котята?'],scheme:'parts',
+  model:{type:'parts',parts:[{v:b,w:b,lab:'укатили'},{v:'?',w:r,lab:'осталось'}],total:{v:a,lab:'было'}},
+  steps:[ST('сколько клубков осталось','−',a,b,r,pw(r,'yarn'),['Клубков в корзинке стало больше или меньше?','Знаем целое (сколько было) и одну часть (сколько укатили). Чтобы найти другую часть, из целого вычитают известную часть.'])],
+  answer:`${r} ${pw(r,'yarn')}`,check:{text:'Вернём укатившиеся клубки обратно — должно получиться, сколько было.',expr:`${r} + ${b}`,val:a},sense:`${r} меньше, чем ${a}. Правильно: часть клубков укатилась.`};},
+ ()=>{let c,a;do{c=R(15,60);a=R(5,c-5);}while(!okAdj(a)||!okAdj(c-a));const r=c-a;
+  return{rq:[['Про кого задача?','Про котят в приюте','Про рыбок в ведёрке','Про одного рыжего котёнка'],[RT,'В приюте есть рыжие и серые котята. Знаем, сколько всех котят и сколько рыжих. Надо узнать, сколько серых.','В приюте есть рыжие и серые котята. Надо узнать, сколько всего котят.','В приют принесли ещё серых котят. Надо узнать, сколько котят стало.']],cond:`В кошачьем приюте ${N(c)} ${pw(c,'kitten')}. Из них ${N(a)} рыжих, а остальные — серые.`,ask:'Сколько серых котят в приюте?',
+  known:[{v:c,t:'всего котят'},{v:a,t:'рыжих котят'}],wrongQ:['Сколько всего котят в приюте?','Сколько рыжих котят в приюте?'],scheme:'parts',
+  model:{type:'parts',parts:[{v:a,w:a,lab:'рыжие'},{v:'?',w:r,lab:'серые'}],total:{v:c,lab:'всего'}},
+  steps:[ST('сколько серых котят','−',c,a,r,pw(r,'kitten'),['Все котята — это целое. Рыжие — одна часть, серые — другая. Что мы ищем: целое или часть?','Чтобы найти часть, из целого вычитают другую часть.'])],
+  answer:`${r} ${pw(r,'kitten')}`,check:{text:'Сложим рыжих и серых — должно получиться, сколько всего котят.',expr:`${a} + ${r}`,val:c},sense:`Серых (${r}) меньше, чем всех котят (${c}). Похоже на правду!`};},
+ ()=>{const c=pick(CH),a=R(4,30),b=R(4,30),r=a+b,v=vb(c,'съел','съела');
+  return{rq:[['Про кого задача?',`Про ${c.acc} и рыбок`,`Про ${oth(c).acc} и мячики`,'Про котят в приюте'],[RT,`${c.nom} ${v} рыбок утром и вечером. Надо узнать, сколько рыбок ${he(c)} ${v} за весь день.`,`${c.nom} ${v} рыбок утром и вечером. Надо узнать, сколько рыбок ${he(c)} ${v} утром.`,`Утром у ${c.gen} были рыбки, вечером часть пропала. Надо узнать, сколько рыбок осталось.`]],cond:`Утром ${c.nom} ${v} ${N(a)} ${pw(a,'fishAcc')}, а вечером — ${N(b)} ${pw(b,'fishAcc')}.`,ask:`Сколько рыбок ${c.nom} ${v} за весь день?`,
+  known:[{v:a,t:'рыбок утром'},{v:b,t:'рыбок вечером'}],wrongQ:[`Сколько рыбок ${c.nom} ${v} утром?`,`Сколько рыбок ${c.nom} ${v} вечером?`],scheme:'parts',
+  model:{type:'parts',parts:[{v:a,w:a,lab:'утром'},{v:b,w:b,lab:'вечером'}],total:{v:'?',lab:'за день'}},
+  steps:[ST('сколько рыбок за весь день','+',a,b,r,pw(r,'fish'),['За весь день — это утро и вечер вместе. Как найти, сколько вместе?','Целое ищем сложением: части складываем.'])],
+  answer:`${r} ${pw(r,'fish')}`,check:{text:'Уберём вечерних рыбок — останутся утренние.',expr:`${r} − ${b}`,val:a},sense:`За день съедено больше, чем утром. Всё сходится!`};}
+],
+2:[
+ ()=>{const[c1,c2]=two(),a=R(10,60),d=R(3,Math.min(25,100-a)),r=a+d;
+  return{rq:[['Про кого задача?',`Про ${c1.acc} и ${c2.acc}`,`Только про ${c1.acc}`,'Про банки с кормом'],[RT,`У ${c1.gen} есть мячики, а у ${c2.gen} мячиков больше. Надо узнать, сколько мячиков у ${c2.gen}.`,`У ${c1.gen} есть мячики, а у ${c2.gen} мячиков меньше. Надо узнать, сколько мячиков у ${c2.gen}.`,`У ${c1.gen} и ${c2.gen} есть мячики. Надо узнать, сколько мячиков у них вместе.`]],cond:`У ${c1.gen} ${N(a)} ${pw(a,'ball')}, а у ${c2.gen} — на ${N(d)} больше.`,ask:`Сколько мячиков у ${c2.gen}?`,
+  known:[{v:a,t:`мячиков у ${c1.gen}`},{v:d,t:`на столько больше у ${c2.gen}`}],wrongQ:[`Сколько мячиков у ${c1.gen}?`,`На сколько больше мячиков у ${c2.gen}?`],scheme:'compare',
+  model:{type:'compare',rows:[{lab:c1.nom,v:a,w:a},{lab:c2.nom,v:'?',w:r}],diff:{v:d,pre:'на '}},
+  steps:[ST(`сколько мячиков у ${c2.gen}`,'+',a,d,r,pw(r,'ball'),[`У кого мячиков больше — у ${c1.gen} или у ${c2.gen}?`,`«На ${d} больше» — значит столько же, сколько у ${c1.gen}, да ещё ${d}. Прибавляем.`])],
+  answer:`${r} ${pw(r,'ball')}`,check:{text:`Если убрать лишние ${d}, должно стать как у ${c1.gen}.`,expr:`${r} − ${d}`,val:a},sense:`У ${c2.gen} больше, чем у ${c1.gen}: ${r} больше ${a}. Верно!`};},
+ ()=>{const a=R(15,90),d=R(3,Math.min(30,a-5)),r=a-d;
+  return{rq:[['Про что задача?','Про две миски с рыбками: синюю и розовую','Про одну синюю миску','Про клубки в корзинке'],[RT,'В синей миске есть рыбки, а в розовой их меньше. Надо узнать, сколько рыбок в розовой миске.','В синей миске есть рыбки, а в розовой их больше. Надо узнать, сколько рыбок в розовой миске.','В синей миске есть рыбки, а в розовой их меньше. Надо узнать, сколько рыбок в синей миске.']],cond:`В синей миске ${N(a)} ${pw(a,'fish')}, а в розовой — на ${N(d)} меньше.`,ask:'Сколько рыбок в розовой миске?',
+  known:[{v:a,t:'рыбок в синей миске'},{v:d,t:'на столько меньше в розовой'}],wrongQ:['Сколько рыбок в синей миске?','На сколько меньше рыбок в розовой миске?'],scheme:'compare',
+  model:{type:'compare',rows:[{lab:'синяя',v:a,w:a},{lab:'розовая',v:'?',w:r}],diff:{v:d,pre:'на '}},
+  steps:[ST('сколько рыбок в розовой миске','−',a,d,r,pw(r,'fish'),['В какой миске рыбок меньше?',`«На ${d} меньше» — значит столько же, сколько в синей, но без ${d}. Вычитаем.`])],
+  answer:`${r} ${pw(r,'fish')}`,check:{text:'Добавим недостающих рыбок — станет как в синей миске.',expr:`${r} + ${d}`,val:a},sense:`В розовой миске меньше, чем в синей. Так и сказано в задаче!`};},
+ ()=>{const[c1,c2]=two(),a=R(15,90),b=R(5,a-3),r=a-b;
+  return{rq:[['Про кого задача?',`Про ${c1.acc} и ${c2.acc}`,`Только про ${c2.acc}`,'Про подушки на диване'],[RT,`У ${c1.gen} и у ${c2.gen} есть клубки. Надо узнать, на сколько у ${c1.gen} клубков больше.`,`У ${c1.gen} и у ${c2.gen} есть клубки. Надо узнать, сколько клубков у них вместе.`,`${c1.nom} отдал${c1.f?'а':''} клубки ${c2.dat}. Надо узнать, сколько клубков осталось.`]],cond:`У ${c1.gen} ${N(a)} ${pw(a,'yarn')}, а у ${c2.gen} — ${N(b)} ${pw(b,'yarn')}.`,ask:`На сколько больше клубков у ${c1.gen}, чем у ${c2.gen}?`,
+  known:[{v:a,t:`клубков у ${c1.gen}`},{v:b,t:`клубков у ${c2.gen}`}],wrongQ:[`Сколько клубков у ${c1.gen} и ${c2.gen} вместе?`,`Сколько клубков у ${c2.gen}?`],scheme:'compare',
+  model:{type:'compare',rows:[{lab:c1.nom,v:a,w:a},{lab:c2.nom,v:b,w:b}],diff:{v:'?',pre:'на '}},
+  steps:[ST(`на сколько больше клубков у ${c1.gen}`,'−',a,b,r,pw(r,'yarn'),['Посмотри на схему: у нижней полоски не хватает кусочка. Как узнать, какой он длины?','Чтобы узнать, на сколько одно число больше другого, из большего вычитают меньшее. Слово «больше» тут не значит «прибавить»!'])],
+  answer:`на ${r} ${pw(r,'yarn')}`,check:{text:`Добавим разницу к клубкам ${c2.gen} — должно стать как у ${c1.gen}.`,expr:`${b} + ${r}`,val:a},sense:`Разница ${r} меньше, чем ${a}. Похоже на правду!`};}
+],
+3:[
+ ()=>{const c=pick(CH),n=R(2,9),k=R(2,9),r=n*k,v=vb(c,'разложил','разложила');
+  return{rq:[['Про кого задача?',`Про ${c.acc} и миски с рыбками`,`Про ${oth(c).acc} и клубки`,'Про банки корма в магазине'],[RT,`${c.nom} ${v} рыбок в миски, в каждую поровну. Надо узнать, сколько всего рыбок.`,`${c.nom} ${v} рыбок в миски, в каждую поровну. Надо узнать, сколько было мисок.`,`${c.nom} съел${c.f?'а':''} рыбок из мисок. Надо узнать, сколько рыбок осталось.`]],cond:`${c.nom} ${v} рыбок в ${N(n)} ${pw(n,'bowl')}, по ${N(k)} ${pw(k,'fish')} в каждую.`,ask:'Сколько всего рыбок в мисках?',
+  known:[{v:n,t:'столько мисок'},{v:k,t:'рыбок в каждой миске'}],wrongQ:['Сколько мисок у котика?','Сколько рыбок в одной миске?'],scheme:'groups',
+  model:{type:'groups',n,k,unknown:'total',top:`${n} ${pw(n,'bowl')}, по ${k} в каждой`,bottom:'Всего: ?'},
+  steps:[ST('сколько всего рыбок','·',k,n,r,pw(r,'fish'),[`Во всех мисках поровну, по ${k}. Это одинаковые группы!`,`Можно складывать: ${Array(n).fill(k).join(' + ')}. А можно короче — умножить: по ${k} взять ${n} раз.`])],
+  answer:`${r} ${pw(r,'fish')}`,check:{text:'Разделим всех рыбок поровну на миски — в каждой должно быть столько, сколько в задаче.',expr:`${r} : ${n}`,val:k},sense:`Всех рыбок больше, чем в одной миске. Верно!`};},
+ ()=>{const k=R(2,9),q=R(2,9),t=k*q;
+  return{rq:[['Про что задача?','Про рыбок и миски','Про котят и мячики','Про подушки на диване'],[RT,'Рыбок разложили в миски, в каждую одинаково. Надо узнать, сколько получилось мисок.','Рыбок разложили в миски, в каждую одинаково. Надо узнать, сколько всего рыбок.','Котики съели рыбок из мисок. Надо узнать, сколько рыбок осталось.']],cond:`${N(t)} ${pw(t,'fishAcc')} разложили в миски, по ${N(k)} в каждую.`,ask:'Сколько мисок понадобилось?',
+  known:[{v:t,t:'всего рыбок'},{v:k,t:'рыбок в каждой миске'}],wrongQ:['Сколько всего рыбок?','Сколько рыбок в одной миске?'],scheme:'groups',
+  model:{type:'groups',n:q,k,unknown:'groups',top:`Всего ${t}, по ${k} в каждой миске`,bottom:'Сколько мисок? ?'},
+  steps:[ST('сколько мисок понадобилось',':',t,k,q,pw(q,'bowl'),[`Рыбок кладут по ${k}. Сколько раз по ${k} поместится в ${t}?`,`Узнать, сколько раз по ${k} помещается в ${t}, — значит разделить ${t} на ${k}.`])],
+  answer:`${q} ${pw(q,'bowl')}`,check:{text:'Умножим миски на рыбок в каждой — должно получиться, сколько всего рыбок.',expr:`${k} · ${q}`,val:t},sense:`Мисок меньше, чем рыбок. Похоже на правду!`};},
+ ()=>{const n=R(2,9),k=R(2,9),t=n*k;
+  return{rq:[['Про кого задача?','Про котят и клубки','Про рыбок в ведёрке','Про одного котёнка с мячиком'],[RT,'Клубки раздали котятам поровну, всем одинаково. Надо узнать, сколько клубков у каждого котёнка.','Клубки раздали котятам поровну. Надо узнать, сколько было котят.','Каждый котёнок принёс ещё клубков. Надо узнать, сколько клубков стало.']],cond:`${N(t)} ${pw(t,'yarn')} поделили поровну между ${N(n)} котятами.`,ask:'Сколько клубков досталось каждому котёнку?',
+  known:[{v:t,t:'всего клубков'},{v:n,t:'столько котят'}],wrongQ:['Сколько всего клубков?','Сколько котят получили клубки?'],scheme:'groups',
+  model:{type:'groups',n,k,unknown:'per',color:'#FF9AA2',top:`Всего ${t}, котят ${n}`,bottom:'Каждому: ?'},
+  steps:[ST('сколько клубков у каждого котёнка',':',t,n,k,pw(k,'yarn'),['Делят поровну — каждому одинаково. Это равные группы.',`Раздать поровну ${t} на ${n} — значит разделить ${t} на ${n}.`])],
+  answer:`${k} ${pw(k,'yarn')}`,check:{text:'Умножим клубки одного котёнка на число котят — должно получиться, сколько было всего.',expr:`${k} · ${n}`,val:t},sense:`У одного котёнка меньше, чем было всего. Верно!`};}
+],
+4:[
+ ()=>{const p=R(2,9),n=R(2,9),r=p*n;
+  return{rq:[['Про что задача?','Про покупку банок кошачьего корма','Про покупку мячиков','Про котят в приюте'],[RT,'Одна банка корма стоит сколько-то рублей. Покупаем несколько таких же банок. Надо узнать, сколько они стоят.','Одна банка корма стоит сколько-то рублей. Надо узнать, сколько стоит одна банка.','Банки корма бывают разной цены. Надо узнать, какая банка дешевле.']],cond:`Банка кошачьего корма стоит ${N(p)} ${pw(p,'rub')}.`,ask:`Сколько стоят ${N(n)} таких ${pw(n,'can')}?`,
+  known:[{v:p,t:'цена одной банки'},{v:n,t:'сколько банок'}],wrongQ:['Сколько стоит одна банка?','Сколько банок купили?'],scheme:'table',
+  model:{type:'table',rows:[[`${p} р.`,`${n} шт.`,'?']]},
+  steps:[ST(`сколько стоят ${n} ${pw(n,'can')}`,'·',p,n,r,pw(r,'rub'),[`Каждая банка стоит ${p} ${pw(p,'rub')}. Банок ${n}. Сколько раз нужно заплатить по ${p}?`,'Стоимость = цена · количество.'])],
+  answer:`${r} ${pw(r,'rub')}`,check:{text:'Разделим всю стоимость на число банок — получится цена одной.',expr:`${r} : ${n}`,val:p},sense:`Несколько банок стоят дороже одной. Верно!`};},
+ ()=>{const n=R(2,9),p=R(2,9),c=n*p;
+  return{rq:[['Про что задача?','Про покупку клубков','Про покупку банок корма','Про котят в приюте'],[RT,'Купили несколько одинаковых клубков и заплатили за все. Надо узнать, сколько стоит один клубок.','Купили несколько одинаковых клубков. Надо узнать, сколько заплатили за все.','Купили один клубок. Надо узнать, сколько клубков осталось в магазине.']],cond:`За ${N(n)} ${pw(n,'yarn')} заплатили ${N(c)} ${pw(c,'rub')}.`,ask:'Сколько стоит один клубок?',
+  known:[{v:n,t:'сколько клубков'},{v:c,t:'стоимость всех клубков'}],wrongQ:['Сколько клубков купили?','Сколько стоят все клубки?'],scheme:'table',
+  model:{type:'table',rows:[['?',`${n} шт.`,`${c} р.`]]},
+  steps:[ST('сколько стоит один клубок',':',c,n,p,pw(p,'rub'),['Все клубки стоят одинаково. Деньги делятся поровну на все клубки.','Цена = стоимость : количество.'])],
+  answer:`${p} ${pw(p,'rub')}`,check:{text:'Умножим цену на количество — получится, сколько заплатили.',expr:`${p} · ${n}`,val:c},sense:`Один клубок дешевле всех вместе. Похоже на правду!`};},
+ ()=>{const p=R(2,9),q=R(2,9),c=p*q;
+  return{rq:[['Про что задача?','Про покупку мячиков','Про покупку клубков','Про подушки для котиков'],[RT,'Мячик стоит сколько-то рублей, и у нас есть деньги. Надо узнать, сколько таких мячиков можно купить.','Мячик стоит сколько-то рублей. Надо узнать, сколько стоит мячик.','У нас есть деньги. Надо узнать, сколько денег останется после покупки.']],cond:`Мячик стоит ${N(p)} ${pw(p,'rub')}.`,ask:`Сколько таких мячиков можно купить на ${N(c)} ${pw(c,'rub')}?`,
+  known:[{v:p,t:'цена одного мячика'},{v:c,t:'сколько денег есть'}],wrongQ:['Сколько стоит один мячик?','Сколько денег у нас есть?'],scheme:'table',
+  model:{type:'table',rows:[[`${p} р.`,'?',`${c} р.`]]},
+  steps:[ST('сколько мячиков можно купить',':',c,p,q,pw(q,'ball'),[`Каждый мячик «забирает» ${p} ${pw(p,'rub')}. Сколько раз по ${p} поместится в ${c}?`,'Количество = стоимость : цена.'])],
+  answer:`${q} ${pw(q,'ball')}`,check:{text:'Умножим цену на количество мячиков — должны получиться все деньги.',expr:`${p} · ${q}`,val:c},sense:`Всё сходится: денег хватает ровно на ${q} ${pw(q,'ball')}.`};}
+],
+5:[
+ ()=>{let k,r,P,T;do{k=R(2,9);r=R(2,9);P=R(4,30);T=P+k*r;}while(T>100);const rest=k*r;
+  return{rq:[['Про что задача?','Про подушки для котиков','Про рыбок в мисках','Про мячики в корзинках'],[RT,'Купили подушки. Часть положили на диван, а остальные разложили по корзинкам, в каждую поровну. Надо узнать, сколько корзинок.','Купили подушки. Часть положили на диван. Надо узнать, сколько подушек на диване.','Все подушки разложили по корзинкам. Надо узнать, сколько всего подушек купили.']],cond:`Для котиков купили ${N(T)} ${pw(T,'pillowAcc')}. На диван положили ${N(P)} ${pw(P,'pillowAcc')}, а остальные разложили по корзинкам, по ${N(k)} в каждую.`,ask:'Сколько корзинок понадобилось?',
+  known:[{v:T,t:'всего подушек'},{v:P,t:'на диван'},{v:k,t:'подушек в каждой корзинке'}],wrongQ:['Сколько подушек положили на диван?','Сколько всего подушек купили?'],scheme:'parts>groups',
+  model:{type:'combo',items:[{type:'parts',parts:[{v:P,w:P,lab:'на диван'},{v:'?',w:rest,lab:'в корзинки'}],total:{v:T,lab:'всего'}},{type:'groups',n:r,k,unknown:'groups',color:'#FFB8C9',top:`Подушки для корзинок, по ${k} в каждой`,bottom:'Сколько корзинок? ?'}]},
+  steps:[ST('сколько подушек разложили по корзинкам','−',T,P,rest,pw(rest,'pillow'),['Можно ли сразу узнать, сколько корзинок? Сначала узнай, сколько подушек пошло в корзинки.','Из всех подушек убираем те, что на диване.']),
+         ST('сколько корзинок понадобилось',':',rest,k,r,pw(r,'basket'),[`Подушки раскладывают по ${k}. Сколько раз по ${k} поместится в ${rest}?`,`Делим: сколько раз по ${k} помещается в ${rest}.`])],
+  answer:`${r} ${pw(r,'basket')}`,check:{text:'Умножим корзинки на подушки в каждой — должно получиться, сколько подушек разложили.',expr:`${k} · ${r}`,val:rest},sense:`Корзинок меньше, чем подушек. Похоже на правду!`};},
+ ()=>{let n,p,m;n=R(2,9);p=R(2,9);do{m=R(2,9);}while(m===n);const C=n*p,r=m*p;
+  return{rq:[['Про что задача?','Про покупку банок корма','Про покупку игрушечных мышек','Про клубки в коробке'],[RT,'Знаем, сколько стоят несколько банок корма. Хотим купить другое число таких же банок. Надо узнать, сколько они стоят.','Знаем, сколько стоят несколько банок корма. Надо узнать, сколько банок купили.','Банки корма бывают разной цены. Надо узнать, какая банка дороже.']],cond:`${N(n)} ${pw(n,'can')} корма стоят ${N(C)} ${pw(C,'rub')}.`,ask:`Сколько стоят ${N(m)} таких ${pw(m,'can')}?`,
+  known:[{v:n,t:'банок в первой покупке'},{v:C,t:'столько они стоят'},{v:m,t:'столько банок хотим купить'}],wrongQ:[`Сколько стоят ${n} ${pw(n,'can')}?`,'Сколько всего банок купили?'],scheme:'table',
+  model:{type:'table',rows:[['?',`${n} шт.`,`${C} р.`],['та же',`${m} шт.`,'?']]},
+  steps:[ST('сколько стоит одна банка',':',C,n,p,pw(p,'rub'),[`Чтобы узнать, сколько стоят ${m} ${pw(m,'can')}, что нужно знать про одну банку?`,'Цена одной = стоимость : количество.']),
+         ST(`сколько стоят ${m} ${pw(m,'can')}`,'·',p,m,r,pw(r,'rub'),['Теперь цена известна. Банок другое количество — сколько они стоят?','Стоимость = цена · количество.'])],
+  answer:`${r} ${pw(r,'rub')}`,check:{text:'Разделим стоимость на количество банок — должна получиться цена одной.',expr:`${r} : ${m}`,val:p},sense:m>n?`Банок больше, значит дороже: ${r} больше ${C}. Верно!`:`Банок меньше, значит дешевле: ${r} меньше ${C}. Верно!`};},
+ ()=>{let n,k,e;do{n=R(2,9);k=R(2,9);e=R(2,20);}while(n*k+e>100);const nk=n*k,r=nk+e;
+  return{rq:[['Про что задача?','Про рыбок в мисках и в ведёрке','Про рыбок только в ведёрке','Про клубки в корзинках'],[RT,'Рыбки лежат в мисках, в каждой поровну, и ещё несколько — в ведёрке. Надо узнать, сколько всего рыбок.','Рыбки лежат в мисках и в ведёрке. Надо узнать, сколько рыбок в одной миске.','Рыбок из ведёрка переложили в миски. Надо узнать, сколько получилось мисок.']],cond:`В ${N(n)} мисках лежит по ${N(k)} ${pw(k,'fish')}, и ещё ${N(e)} ${pw(e,'fish')} — в ведёрке.`,ask:'Сколько всего рыбок?',
+  known:[{v:n,t:'мисок'},{v:k,t:'рыбок в каждой миске'},{v:e,t:'рыбок в ведёрке'}],wrongQ:['Сколько рыбок в ведёрке?','Сколько рыбок в одной миске?'],scheme:'groups>parts',
+  model:{type:'combo',items:[{type:'groups',n,k,unknown:'total',top:`${n} ${pw(n,'bowl')}, по ${k}`,bottom:'В мисках: ?'},{type:'parts',parts:[{v:'?',w:nk,lab:'в мисках'},{v:e,w:e,lab:'в ведёрке'}],total:{v:'?',lab:'всего'}}]},
+  steps:[ST('сколько рыбок во всех мисках','·',k,n,nk,pw(nk,'fish'),['Сначала посчитаем рыбок в мисках. В каждой поровну!',`По ${k} взять ${n} раз — это умножение.`]),
+         ST('сколько всего рыбок','+',nk,e,r,pw(r,'fish'),['Рыбки в мисках и рыбки в ведёрке — две части. Ищем всё вместе.','Целое ищем сложением.'])],
+  answer:`${r} ${pw(r,'fish')}`,check:{text:'Уберём рыбок из ведёрка — должно остаться столько, сколько в мисках.',expr:`${r} − ${e}`,val:nk},sense:`Всего рыбок больше, чем в мисках. Верно!`};},
+ ()=>{let T,n,k;do{T=R(30,100);n=R(2,5);k=R(2,9);}while(n*k>T-3);const nk=n*k,r=T-nk;
+  return{rq:[['Про что задача?','Про клубки в коробке и котят','Про рыбок в мисках','Про мячики на диване'],[RT,'В коробке были клубки. Котята унесли несколько корзинок клубков, в каждой поровну. Надо узнать, сколько клубков осталось в коробке.','В коробке были клубки. Котята унесли корзинки с клубками. Надо узнать, сколько корзинок унесли.','Котята принесли в коробку ещё клубков. Надо узнать, сколько клубков стало.']],cond:`В большой коробке было ${N(T)} ${pw(T,'yarn')}. Котята унесли ${N(n)} ${pw(n,'basket')} клубков, по ${N(k)} в каждой.`,ask:'Сколько клубков осталось в коробке?',
+  known:[{v:T,t:'клубков было в коробке'},{v:n,t:'корзинок унесли'},{v:k,t:'клубков в каждой корзинке'}],wrongQ:['Сколько клубков было в коробке?','Сколько корзинок унесли котята?'],scheme:'groups>parts',
+  model:{type:'combo',items:[{type:'groups',n,k,unknown:'total',color:'#FF9AA2',top:`${n} ${pw(n,'basket')}, по ${k}`,bottom:'Унесли: ?'},{type:'parts',parts:[{v:'?',w:nk,lab:'унесли'},{v:'?',w:r,lab:'осталось'}],total:{v:T,lab:'было'}}]},
+  steps:[ST('сколько клубков унесли','·',k,n,nk,pw(nk,'yarn'),['Сколько клубков унесли? Корзинки одинаковые!',`По ${k} взять ${n} раз — это умножение.`]),
+         ST('сколько клубков осталось','−',T,nk,r,pw(r,'yarn'),['Знаем, сколько было, и сколько унесли. Сколько осталось?','Из целого вычитаем часть.'])],
+  answer:`${r} ${pw(r,'yarn')}`,check:{text:'Вернём унесённые клубки — должно стать, как было.',expr:`${r} + ${nk}`,val:T},sense:`Осталось меньше, чем было. Похоже на правду!`};},
+ ()=>{let a,d;const[c1,c2]=two();do{a=R(10,45);d=R(3,20);}while(2*a+d>100);const b=a+d,r=a+b;
+  return{rq:[['Про кого задача?',`Про ${c1.acc} и ${c2.acc}`,`Только про ${c2.acc}`,'Про банки корма'],[RT,`У ${c2.gen} мячиков больше, чем у ${c1.gen}. Надо узнать, сколько мячиков у них вместе.`,`У ${c2.gen} мячиков меньше, чем у ${c1.gen}. Надо узнать, сколько мячиков у них вместе.`,`У ${c2.gen} мячиков больше, чем у ${c1.gen}. Надо узнать, на сколько больше.`]],cond:`У ${c1.gen} ${N(a)} ${pw(a,'ball')}, а у ${c2.gen} — на ${N(d)} больше.`,ask:'Сколько мячиков у них вместе?',
+  known:[{v:a,t:`мячиков у ${c1.gen}`},{v:d,t:`на столько больше у ${c2.gen}`}],wrongQ:[`Сколько мячиков у ${c1.gen}?`,`На сколько больше мячиков у ${c2.gen}?`],scheme:'compare>parts',
+  model:{type:'combo',items:[{type:'compare',rows:[{lab:c1.nom,v:a,w:a},{lab:c2.nom,v:'?',w:b}],diff:{v:d,pre:'на '}},{type:'parts',parts:[{v:a,w:a,lab:c1.nom},{v:'?',w:b,lab:c2.nom}],total:{v:'?',lab:'вместе'}}]},
+  steps:[ST(`сколько мячиков у ${c2.gen}`,'+',a,d,b,pw(b,'ball'),[`Сколько мячиков у ${c2.gen}, мы пока не знаем. Узнаем сначала это!`,`«На ${d} больше» — прибавляем.`]),
+         ST('сколько мячиков у них вместе','+',a,b,r,pw(r,'ball'),['Теперь знаем мячики обоих. Как узнать, сколько вместе?','Целое ищем сложением.'])],
+  answer:`${r} ${pw(r,'ball')}`,check:{text:`Уберём мячики ${c2.gen} — должны остаться мячики ${c1.gen}.`,expr:`${r} − ${b}`,val:a},sense:`Вместе больше, чем у каждого. Верно!`};}
+],
+6:[
+ ()=>{let p,q,r,c;do{p=R(3,9);q=R(1,9);r=R(1,p-1);c=p*q+r;}while(c>99);
+  return{rq:[['Про что задача?','Про покупку клубков','Про котят в приюте','Про рыбок в мисках'],[RT,'Клубок стоит сколько-то рублей. У нас есть деньги. Надо узнать, сколько клубков можно купить и сколько денег останется.','Клубок стоит сколько-то рублей. Надо узнать, сколько стоит клубок.','Купили клубки на все деньги, ничего не осталось. Надо узнать, сколько стоил один клубок.']],cond:`Клубок стоит ${N(p)} ${pw(p,'rub')}.`,ask:`Сколько клубков можно купить на ${N(c)} ${pw(c,'rub')}? Сколько денег останется?`,
+  known:[{v:p,t:'цена одного клубка'},{v:c,t:'сколько денег есть'}],wrongQ:['Сколько стоит один клубок?','Сколько денег было сначала?'],scheme:'groups',
+  model:{type:'groups',n:q,k:p,unknown:'groups',left:true,color:'#FFD66B',top:`${c} р., клубок по ${p} р.`,bottom:'Сколько клубков? ?'},
+  steps:[ST('сколько клубков можно купить и сколько денег останется',':',c,p,q,pw(q,'yarn'),[`Каждый клубок «забирает» ${p} ${pw(p,'rub')}. Сколько раз по ${p} поместится в ${c}?`,'Это деление. Но поровну не делится: какие-то деньги останутся.'],{rem:r,remUnit:pw(r,'rub')})],
+  answer:`${q} ${pw(q,'yarn')}, останется ${r} ${pw(r,'rub')}`,check:{text:'Умножим клубки на цену и прибавим остаток — должны получиться все деньги.',expr:`${q} · ${p} + ${r}`,val:c},sense:`Остаток ${r} меньше цены ${p}: на ещё один клубок денег уже не хватит. Всё верно!`};},
+ ()=>{let k,q,r,c;do{k=R(3,9);q=R(2,9);r=R(1,k-1);c=k*q+r;}while(c>99);
+  return{rq:[['Про что задача?','Про рыбок и миски','Про котят и клубки','Про банки корма'],[RT,'Рыбок раскладывают в миски, в каждую поровну. Несколько рыбок останутся лишними. Надо узнать, сколько мисок наполнят и сколько рыбок останется.','Рыбок раскладывают в миски. Надо узнать, сколько всего рыбок.','Котики съели рыбок. Надо узнать, сколько рыбок съели.']],cond:`${N(c)} ${pw(c,'fishAcc')} разложили в миски, по ${N(k)} в каждую.`,ask:'Сколько мисок наполнили? Сколько рыбок осталось?',
+  known:[{v:c,t:'всего рыбок'},{v:k,t:'рыбок в каждой миске'}],wrongQ:['Сколько всего рыбок?','Сколько рыбок в каждой миске?'],scheme:'groups',
+  model:{type:'groups',n:q,k,unknown:'groups',left:true,top:`Всего ${c}, по ${k} в миске`,bottom:'Сколько мисок? ?'},
+  steps:[ST('сколько мисок наполнили и сколько рыбок осталось',':',c,k,q,pw(q,'bowl'),[`Рыбок кладут по ${k}. Сколько полных мисок получится?`,'Делим. Ровно не делится — несколько рыбок останутся.'],{rem:r,remUnit:pw(r,'fish')})],
+  answer:`${q} ${pw(q,'bowl')}, останется ${r} ${pw(r,'fish')}`,check:{text:'Умножим миски на рыбок в каждой и прибавим остаток — должно получиться, сколько было рыбок.',expr:`${q} · ${k} + ${r}`,val:c},sense:`Остаток ${r} меньше ${k} — из него полную миску не собрать. Верно!`};},
+ ()=>{let n,p,q,r,c;do{n=R(3,9);p=R(3,9);q=R(1,5);r=R(1,p-1);c=p*q+r;}while(c>99||p*n>99);const C=n*p;
+  return{rq:[['Про что задача?','Про покупку игрушечных мышек','Про настоящих мышек в норке','Про клубки в корзинке'],[RT,'Знаем, сколько стоят несколько одинаковых мышек. У нас есть деньги. Надо узнать, сколько таких мышек можно купить и сколько денег останется.','Знаем, сколько стоят несколько мышек. Надо узнать, сколько стоят эти мышки.','Мышек раздали котятам. Надо узнать, сколько мышек у каждого.']],cond:`${N(n)} ${pw(n,'toymouse')} стоят ${N(C)} ${pw(C,'rub')}.`,ask:`Сколько таких мышек можно купить на ${N(c)} ${pw(c,'rub')}? Сколько денег останется?`,
+  known:[{v:n,t:'мышек в первой покупке'},{v:C,t:'столько они стоят'},{v:c,t:'сколько денег есть'}],wrongQ:['Сколько стоит одна мышка?',`Сколько стоят ${n} ${pw(n,'mouse')}?`],scheme:'table>groups',
+  model:{type:'combo',items:[{type:'table',rows:[['?',`${n} шт.`,`${C} р.`]]},{type:'groups',n:q,k:p,unknown:'groups',left:true,color:'#FFD66B',top:`${c} р., по цене одной мышки`,bottom:'Сколько мышек? ?'}]},
+  steps:[ST('сколько стоит одна мышка',':',C,n,p,pw(p,'rub'),['Чтобы понять, сколько мышек купить, что нужно знать про одну мышку?','Цена = стоимость : количество.']),
+         ST('сколько мышек можно купить и сколько денег останется',':',c,p,q,pw(q,'mouse'),[`Каждая мышка «забирает» ${p} ${pw(p,'rub')}. Сколько раз по ${p} поместится в ${c}?`,'Делим. Ровно не делится — останутся деньги.'],{rem:r,remUnit:pw(r,'rub')})],
+  answer:`${q} ${pw(q,'mouse')}, останется ${r} ${pw(r,'rub')}`,check:{text:'Умножим мышек на цену и прибавим остаток — должны получиться все деньги.',expr:`${q} · ${p} + ${r}`,val:c},sense:`Остаток ${r} меньше цены ${p} — ещё одну мышку не купить. Всё верно!`};}
+]};
+const LV={1:{t:'Прибавить или убавить',ex:'Было 8 рыбок, поймал ещё 5'},2:{t:'Больше на, меньше на',ex:'У Мурки на 3 мячика больше'},3:{t:'Равные группы',ex:'По 3 рыбки в 4 мисках'},4:{t:'Цена, количество, стоимость',ex:'Банка корма стоит 6 рублей'},5:{t:'Задачи в два действия',ex:'Как задача про стулья'},6:{t:'Деление с остатком',ex:'Как карандаши на 20 рублей'}};
+const GOAL=4;
+const SCH_POOL_COMBO=['parts>groups','groups>parts','compare>parts','table>groups','compare>groups','table'];
+function makeTask(level){
+  const t=pick(GEN[level])();t.level=level;
+  let pool=level>=5||t.scheme.includes('>')?SCH_POOL_COMBO:(level===4?['table','compare','parts']:['parts','compare','groups']);
+  t.schemeOpts=shuffle([t.scheme,...shuffle(pool.filter(x=>x!==t.scheme)).slice(0,2)]);
+  t.qOpts=shuffle([t.ask.replace(/\{\{(\d+)\}\}/g,'$1'),...t.wrongQ]);
+  t.rq=(t.rq||[]).map(a=>{const q=a[0],good=a[1];const opts=shuffle(a.slice(1));return{q,opts,ok:opts.indexOf(good)};});
+  t.kws=findKW(t.cond+' '+t.ask);
+  t.text=t.cond+' '+t.ask;
+  return t;
+}
+const plain=s=>s.replace(/\{\{(\d+)\}\}/g,'$1');
+/* слова-ключи: те же, что разбирают в школе по учебнику Моро */
+const KWM={'по':'«по … в каждую» — во всех одинаково','каждый':'«каждый» — все до одного, без исключений','остальные':'«остальные» — все, кроме тех, о ком уже сказали','осталось':'«осталось / останется» — то, что не забрали и не потратили','таких':'«таких же» — точно такие же, цена та же','поровну':'«поровну» — всем одинаково','ещё':'«ещё» — добавили к тому, что уже было','больше':'«на … больше / меньше» — сравниваем: у кого больше, у кого меньше','всего':'«всего / вместе» — всё вместе, целое'};
+const KWW={'по':'по','каждую':'каждый','каждой':'каждый','каждом':'каждый','каждому':'каждый','каждый':'каждый','остальные':'остальные','осталось':'осталось','останется':'осталось','таких':'таких','поровну':'поровну','ещё':'ещё','больше':'больше','меньше':'больше','всего':'всего','вместе':'всего'};
+const KWRE=/(^|[\s(«—])(по|каждую|каждой|каждом|каждому|каждый|остальные|осталось|останется|таких|поровну|ещё|больше|меньше|всего|вместе)(?=[\s,.?!»:])/gi;
+function findKW(text){const seen=[];text.replace(KWRE,(m,a,w)=>{const k=KWW[w.toLowerCase()];if(k&&!seen.includes(k))seen.push(k);return m;});return seen;}
+function markKW(html){return html.replace(KWRE,(m,a,w)=>`${a}<span class="kw">${w}</span>`);}
+function evalExpr(e){const m=e.replace(/·/g,'*').replace(/−/g,'-').replace(/:/g,'/');if(!/^[\d\s+\-*/]+$/.test(m))return NaN;return Function('return ('+m+')')();}
+
+/* ---------- звук и эффекты ---------- */
+let AC=null;
+function chime(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime;[523,659,784,1047].forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t0+i*.09);g.gain.linearRampToValueAtTime(.12,t0+i*.09+.02);g.gain.exponentialRampToValueAtTime(.001,t0+i*.09+.35);o.connect(g).connect(AC.destination);o.start(t0+i*.09);o.stop(t0+i*.09+.4);});}catch(e){}}
+function confetti(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;const sh=[FISH,`<svg viewBox="0 0 20 20"><path d="M10,17 C-4,8 4,-2 10,5 C16,-2 24,8 10,17Z" fill="#FF8FB1"/></svg>`,`<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="#FFD66B"/></svg>`];
+  for(let i=0;i<26;i++){const d=document.createElement('div');d.className='confetti';d.innerHTML=pick(sh);d.style.left=R(0,96)+'vw';d.style.width=R(18,34)+'px';d.style.animationDelay=(Math.random()*.5)+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}}
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}
+let ruVoice=null;function findVoice(){try{const v=speechSynthesis.getVoices();ruVoice=v.find(x=>/^ru/i.test(x.lang)&&/female|жен|Milena|Alena|Irina/i.test(x.name))||v.find(x=>/^ru/i.test(x.lang))||null;}catch(e){}}
+try{if('speechSynthesis' in window){findVoice();speechSynthesis.onvoiceschanged=findVoice;}}catch(e){}
+function speak(text){try{if(!('speechSynthesis' in window)){toast('Этот браузер не умеет читать вслух. Попроси взрослого прочитать.');return;}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(plain(text).replace(/·/g,' умножить на ').replace(/:/g,' разделить на ').replace(/−/g,' минус '));u.lang='ru-RU';if(ruVoice)u.voice=ruVoice;u.rate=.88;speechSynthesis.speak(u);}catch(e){toast('Не получилось включить голос.');}}
+
+/* ---------- экраны ---------- */
+const app=document.getElementById('app'),layer=document.getElementById('layer');
+let screen='home',T=null,P=null,shopTab='wear';
+function topbar(title,back){return `<div class="top">${back?`<button class="btn small" data-act="home" aria-label="Домой">← Домой</button>`:''}<div class="grow"><h1>${esc(title)}</h1></div><span class="pill" aria-label="рыбок">${FISH}<span id="fishN">${S.fish}</span></span></div>`;}
+function go(s){screen=s;render();window.scrollTo(0,0);}
+function render(){ensureDefs();if(!S.cat){renderSetup();return;}if(screen==='play')renderPlay();else if(screen==='shop')renderShop();else renderHome();}
+
+let setupCat='ginger';
+function renderSetup(){
+  app.innerHTML=`<div class="top"><div class="grow"><h1>Котики-математики</h1></div><button class="btn small" data-act="parents">Для взрослых</button></div>
+  <div class="card pop"><h2 style="font-size:26px">Привет! Выбери себе котика</h2><p class="muted" style="margin:6px 0 0">Он будет помогать решать задачки, а за каждую решённую задачу получит рыбки.</p></div>
+  <div class="grid cats">${Object.keys(CATS).map(k=>`<button class="catpick ${k===setupCat?'on':''}" data-cat="${k}" aria-pressed="${k===setupCat}">${catSVG(k,{mood:k===setupCat?'happy':'normal'})}<span>${CATS[k].label}</span></button>`).join('')}</div>
+  <div class="card grid"><label for="catname"><h2 style="font-size:22px">Как зовут котика?</h2></label>
+  <input id="catname" class="name" maxlength="16" placeholder="Например, Мурзик" value="${esc(S.name||'')}" autocomplete="off">
+  <div class="row">${['Мурзик','Пушинка','Ириска','Тучка','Снежок','Персик'].map(n=>`<button class="chip" data-nm="${n}">${n}</button>`).join('')}</div>
+  <button class="btn main" data-act="startgame">Готово, играем!</button></div>`;
+}
+function renderHome(){
+  const nm=S.name||'Котик';
+  app.innerHTML=topbar(nm,false)+`<div class="roombox pop">${roomSVG('normal')}</div>
+  <div class="row"><button class="btn sun" data-act="shop">Комната и магазин</button><button class="btn small" data-act="parents">Для взрослых</button></div>
+  <h2 style="font-size:24px;margin-top:6px">Выбери уровень</h2>
+  <div class="grid levels">${[1,2,3,4,5,6].map(l=>{const lock=l>S.unlocked;const st=S.streak[l]||0;return `<button class="lvl ${l===S.level?'cur':''} ${lock?'locked':''}" data-lvl="${l}" ${lock?'aria-disabled="true"':''}><span class="num">${lock?`<svg viewBox="0 0 24 24" width="24" height="24" aria-label="закрыто"><rect x="5" y="11" width="14" height="10" rx="3" fill="${LINE}"/><path d="M8,11 V8 a4,4 0 0 1 8,0 V11" fill="none" stroke="${LINE}" stroke-width="2.5"/></svg>`:l}</span><span style="min-width:0"><b>${LV[l].t}</b><small>${lock?'Откроется, когда пройдёшь уровень '+(l-1):LV[l].ex}</small>${lock?'':`<span class="dots" aria-label="верных подряд: ${Math.min(st,GOAL)} из ${GOAL}">${Array.from({length:GOAL},(_,i)=>`<i class="${i<Math.min(st,GOAL)?'on':''}"></i>`).join('')}</span>`}</span></button>`;}).join('')}</div>
+  <p class="muted" style="font-size:16px;margin:0">Решено задач: ${S.total}. Кружочки — сколько задач подряд решено без ошибок в счёте. ${GOAL} кружочка — и открывается следующий уровень.</p>`;
+}
+function renderShop(){
+  const tab=TABS.find(t=>t.id===shopTab)||TABS[0];
+  app.innerHTML=topbar('Комната и магазин',true)+`<div class="roombox">${roomSVG('happy')}</div>
+  <p class="muted" style="margin:0;font-size:17px">Покупай вещи за рыбки. Нажми «Надеть» или «Поставить» — и вещь появится у котика.</p>
+  <div class="tabs" role="tablist">${TABS.map(t=>`<button class="tab ${t.id===tab.id?'on':''}" data-tab="${t.id}" role="tab" aria-selected="${t.id===tab.id}">${t.n}</button>`).join('')}</div>
+  <div class="grid shopgrid">${IT_ORDER.filter(id=>tab.c.includes(IT[id].c)).map(id=>{const it=IT[id],own=S.owned.includes(id),on=isOn(id),wear=it.c==='head'||it.c==='neck';
+    let b;if(own)b=`<button class="btn ${on?'':'mint'}" data-tog="${id}">${on?(wear?'Снять':'Убрать'):(wear?'Надеть':'Поставить')}</button>`;
+    else if(S.fish>=it.p)b=`<button class="btn main" data-buy="${id}">Купить</button>`;else b=`<button class="btn" disabled>Ещё ${it.p-S.fish} ${pw(it.p-S.fish,'fish')}</button>`;
+    return `<div class="item ${on?'on':''}">${itemIcon(id)}<div class="nm">${it.n}</div>${own?`<span class="muted" style="font-size:15px">${on?'Уже у котика':'Есть'}</span>`:`<span class="pill" style="box-shadow:none;background:var(--sky2)">${FISH}${it.p}</span>`}${b}</div>`;}).join('')}</div>`;
+}
+
+/* ---------- игра ---------- */
+const STEPNAMES=['Понимаю','Что знаю?','Что найти?','Схема','Решаю','Проверяю'];
+function newTask(level){S.level=level;save();T=makeTask(level);P={phase:'read',rqi:0,readAns:[],found:[],si:0,hint:0,mistakes:0,calcMistakes:0,input:['',''],active:0,lines:[],bad:[],fb:null,checked:false};screen='play';render();window.scrollTo(0,0);}
+function stepIndex(){return{read:0,nums:1,find:2,scheme:3,op:4,calc:4,check:5,done:6}[P.phase];}
+function taskHTML(){const parts=[];let idx=0;const mk=s=>markKW(esc(s)).replace(/\{\{(\d+)\}\}/g,(m,n)=>{const i=idx++;const on=P.found.includes(i);const live=P.phase==='nums';const pulse=live&&!on&&P.hint>=2;return `<button class="nchip ${on?'on':''} ${pulse?'pulse':''} ${live?'':'dead'}" data-num="${i}" ${live?'':'tabindex="-1"'}>${n}</button>`;});
+  parts.push(mk(T.cond));parts.push(` <span class="q ${P.phase==='find'&&P.hint>=2?'hl':''}">${mk(T.ask)}</span>`);return parts.join('');}
+function notebook(){
+  let s=`<div class="note"><h3>Мой блокнот</h3>`;
+  if(P.readAns.length)s+=`<div class="sec"><div class="lab">Я поняла задачу так</div>${P.readAns.map(a=>`<div class="about">${esc(a)}</div>`).join('')}</div>`;
+  if(T.kws.length)s+=`<div class="sec"><div class="lab">Слова-подсказки</div><div class="kwl">${T.kws.map(k=>`<span>${esc(KWM[k])}</span>`).join('')}</div></div>`;
+  if(P.found.length)s+=`<div class="sec"><div class="lab">Известно (краткая запись)</div><ul>${P.found.slice().sort((a,b)=>a-b).map(i=>`<li><b>${T.known[i].v}</b> — ${esc(T.known[i].t)}</li>`).join('')}</ul></div>`;
+  if(stepIndex()>2)s+=`<div class="sec"><div class="lab">Найти</div><div>${esc(plain(T.ask))}</div></div>`;
+  if(stepIndex()>3)s+=`<div class="sec"><div class="lab">Схема</div>${renderModel(T.model)}</div>`;
+  if(P.lines.length)s+=`<div class="sec"><div class="lab">Решение</div>${P.lines.map(l=>`<div class="sol">${esc(l)}</div>`).join('')}</div>`;
+  if(P.phase==='check'||P.phase==='done')s+=`<div class="ans">Ответ: ${esc(T.answer)}.</div>`;
+  if(!P.found.length&&!T.kws.length&&stepIndex()<=1)s+=`<p class="muted" style="margin:0;font-size:17px">Здесь появится всё, что мы узнаем о задаче.</p>`;
+  return s+`</div>`;
+}
+function stepPanel(){
+  const st=T.steps[P.si];const multi=T.steps.length>1;let name='',say='',body='',hints=[];
+  if(P.phase==='read'){const Q=T.rq[P.rqi];name=`Шаг 1 · Понимаю задачу${T.rq.length>1?` (вопрос ${P.rqi+1} из ${T.rq.length})`:''}`;
+    say=(P.rqi===0?'Прочитай задачу и представь её, как мультик. ':'')+Q.q;
+    body=`<div class="opts">${Q.opts.map((q,i)=>`<button class="opt ${P.bad.includes(i)?'bad':''}" data-rq="${i}" ${P.bad.includes(i)?'disabled':''}>${esc(q)}</button>`).join('')}</div>`;
+    hints=['Прочитай задачу ещё раз, медленно, по одному предложению. Можно нажать «Прочитай мне».',P.rqi===0?'Кто или что есть в первом предложении задачи?':'Представь, что ты рассказываешь эту задачу маме. Что случилось? А что спрашивают в конце, в предложении со знаком «?»?','Один неверный вариант я убрал.'];}
+  else if(P.phase==='nums'){name='Шаг 2 · Что я знаю?';say=`Найди в задаче все числа и нажми на каждое. Найдено: ${P.found.length} из ${T.known.length}.`;
+    hints=['Числа записаны цифрами. Прочитай задачу по одному предложению — в каждом может прятаться число.','Я подсветил числа, которые ещё не найдены. Нажми на них!','Нажимаю одно число за тебя. Найди остальные!'];}
+  else if(P.phase==='find'){name='Шаг 3 · Что нужно найти?';say='Что спрашивают в задаче? Выбери вопрос.';
+    body=`<div class="opts">${T.qOpts.map((q,i)=>`<button class="opt ${P.bad.includes(i)?'bad':''}" data-q="${i}" ${P.bad.includes(i)?'disabled':''}>${esc(q)}</button>`).join('')}</div>`;
+    hints=['Вопрос задачи — это предложение со знаком «?». Обычно оно в самом конце. А то, что мы уже знаем, спрашивать не нужно.','Я подсветил вопрос в тексте задачи. Прочитай его ещё раз.','Один неверный вариант я убрал.'];}
+  else if(P.phase==='scheme'){name='Шаг 4 · Рисуем схему';say='Какая схема подходит к этой задаче?';
+    body=`<div class="grid opts schemes">${T.schemeOpts.map((id,i)=>`<button class="opt ${P.bad.includes(i)?'bad':''}" data-sc="${i}" ${P.bad.includes(i)?'disabled':''}>${schemeMini(id)}<span>${schemeLabel(id)}</span></button>`).join('')}</div>`;
+    const first=T.scheme.split('>')[0];hints=[T.scheme.includes('>')?'В этой задаче два действия. Что узнаем сначала, а что потом? '+SHINT[first]:SHINT[T.scheme],'Вот как можно нарисовать эту задачу:'+renderModel(T.model),'Один неверный вариант я убрал.'];}
+  else if(P.phase==='op'){name=`Шаг 5 · ${multi?`Действие ${P.si+1} из ${T.steps.length}`:'Выбираем действие'}`;say=`Узнаём: ${st.label}. Какое действие поможет?`;
+    const ops=[['+','прибавить'],['−','вычесть'],['·','умножить'],[':','разделить']];
+    body=`<div class="grid ops">${ops.map(([o,w])=>`<button class="op ${P.bad.includes(o)?'bad':''}" data-op="${o}" ${P.bad.includes(o)?'disabled':''} aria-label="${w}"><b>${o}</b><small>${w}</small></button>`).join('')}</div>`;
+    hints=[st.hints[0],st.hints[1],`Здесь нужно действие «${st.op}»: ${st.a} ${st.op} ${st.b}.`];}
+  else if(P.phase==='calc'){name=`Шаг 5 · ${multi?`Действие ${P.si+1} из ${T.steps.length}`:'Считаем'}`;say=st.rem!==undefined?'Посчитай. Сколько получится и сколько останется?':'Посчитай!';
+    body=`<div class="expr">${st.a} ${st.op} ${st.b} = ${boxHTML(0)}${st.rem!==undefined?` <span style="font-size:24px">ост.</span> ${boxHTML(1)}`:''}</div>${keypad()}`;
+    hints=calcHints(st);}
+  else if(P.phase==='check'){name='Шаг 6 · Проверяем';say=`Ответ: ${T.answer}. ${T.check.text}`;
+    body=`<div class="expr">${T.check.expr} = ${boxHTML(0)}</div>${keypad()}`;
+    hints=checkHints();}
+  const hint=P.hint>0?`<div class="hintbox">${hints.slice(0,P.hint).map((h,i)=>`<div style="${i?'margin-top:8px':''}">${i===0?'':'<b>Ещё подсказка: </b>'}${h}</div>`).join('')}</div>`:'';
+  const fb=P.fb&&!P.fb.ok?`<div class="fb no">${P.fb.t}</div>`:'';const fbTop=P.fb&&P.fb.ok?`<div class="fb yes top">${P.fb.t}</div>`:'';
+  const canHint=P.hint<hints.length;
+  return `<div class="helper" id="stepPanel"><div class="ava">${catSVG(S.cat,{wear:S.wear,mood:P.fb&&P.fb.ok?'happy':'normal'})}</div><div class="bubble">${fbTop}<div class="stepname">${name}</div><div class="say">${say}</div>${body}${fb}${hint}
+  <div class="helpbar"><button class="btn small sun" data-act="hint" ${canHint?'':'disabled'}>${P.hint===0?'Подсказка':'Ещё подсказка'}</button><button class="btn small" data-act="sayStep" aria-label="Прочитай подсказку вслух">Прочитай мне</button></div></div></div>`;
+}
+function boxHTML(i){return `<button class="box ${P.active===i?'act':''}" data-box="${i}" aria-label="${i?'остаток':'ответ'}">${esc(P.input[i]||'')}</button>`;}
+function keypad(){return `<div class="keypad">${[1,2,3,4,5,6,7,8,9,0].map(d=>`<button class="key" data-key="${d}">${d}</button>`).join('')}<button class="key del" data-key="del" aria-label="Стереть" style="grid-column:span 2">Стереть</button><button class="key ok" data-key="ok" style="grid-column:span 3">Готово</button></div>`;}
+function calcHints(st){const a=st.a,b=st.b;
+  if(st.op==='+'){const bt=b-b%10,bo=b%10;return b<10?[`Прибавляй по одному: от ${a} отсчитай ещё ${b}.`,`${a} + ${b}: сначала дополни ${a} до круглого числа.`,`Ответ чуть больше, чем ${a}. Досчитай!`]:[`Сначала прибавь десятки, потом единицы.`,`${a} + ${b} = ${a} + ${bt}${bo?` + ${bo}`:''}`,`${a} + ${bt} = ${a+bt}${bo?`. Осталось прибавить ${bo}.`:'.'}`];}
+  if(st.op==='−'){const bt=b-b%10,bo=b%10;return b<10?[`Отсчитай назад от ${a} ровно ${b}.`,`${a} − ${b}: сначала вычти до круглого числа, потом остальное.`,`Ответ чуть меньше, чем ${a}.`]:[`Сначала вычти десятки, потом единицы.`,`${a} − ${b} = ${a} − ${bt}${bo?` − ${bo}`:''}`,`${a} − ${bt} = ${a-bt}${bo?`. Осталось вычесть ${bo}.`:'.'}`];}
+  if(st.op==='·')return['Умножить — значит сложить одинаковые числа.',`${a} · ${b} = ${Array(b).fill(a).join(' + ')}`,`${a} · ${b-1} = ${a*(b-1)}. Прибавь ещё ${a}.`];
+  if(st.rem!==undefined){const rows=[];for(let i=1;i<=9&&b*i<=a+b;i++)rows.push(`<span style="white-space:nowrap">${b} · ${i} = ${b*i}</span>`);return[`Найди самое большое число, которое можно умножить на ${b}, чтобы получилось не больше ${a}.`,`Посмотри на таблицу: ${rows.join(', ')}. Какое число самое близкое к ${a}, но не больше?`,`${b} · ${st.res} = ${b*st.res}. А сколько осталось до ${a}?`];}
+  const rows=[];for(let i=1;i<=st.res;i++)rows.push(`${b} · ${i} = ${b*i}`);return[`Разделить — значит найти число, которое при умножении на ${b} даст ${a}.`,`${b} · ? = ${a}`,`Посмотри: ${rows.slice(-3).join(', ')}.`];}
+function checkHints(){const c=T.check;return['Проверка — это обратное действие. Если ответ верный, получится число из условия.',`Посчитай по шагам: ${c.expr}.`,`Должно получиться ${c.val}. Посчитай и убедись!`];}
+
+function renderPlay(){
+  const si=stepIndex();
+  app.innerHTML=topbar(`Уровень ${T.level}`,true)+`<div class="card pop"><div class="taskhead"><span class="tag">${LV[T.level].t.toUpperCase()}</span><button class="btn small sky" data-act="read">Прочитай мне</button></div><div class="task">${taskHTML()}</div></div>
+  <div class="steps" aria-label="шаги">${STEPNAMES.map((n,i)=>`<span class="${i===si?'on':i<si?'done':''}">${i+1}. ${n}</span>`).join('')}</div>
+  ${notebook()}${stepPanel()}`;
+}
+function scrollStep(){const el=document.getElementById('stepPanel');if(el&&el.scrollIntoView){try{el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});}catch(e){}}}
+function nextPhase(ph){P.phase=ph;P.hint=0;P.bad=[];P.input=['',''];P.active=0;renderPlay();scrollStep();}
+const SOFT=['Почти! Давай подумаем ещё.','Не страшно, попробуем ещё раз.','Хм, не то. Котик тоже иногда путается!','Ошибка — это подсказка, куда смотреть. Ещё разок!'];
+function wrong(t){P.mistakes++;P.fb={ok:false,t:t||pick(SOFT)};}
+
+function onRQ(i){if(P.phase!=='read')return;const Q=T.rq[P.rqi];
+  if(i===Q.ok){P.readAns.push(Q.opts[i]);P.rqi++;
+    if(P.rqi>=T.rq.length){P.fb={ok:true,t:'Ты поняла задачу! Теперь найдём в ней числа.'};nextPhase('nums');}
+    else{P.fb={ok:true,t:'Верно! Ещё один вопрос.'};P.hint=0;P.bad=[];renderPlay();scrollStep();}}
+  else{P.bad.push(i);wrong('Не совсем так. Прочитай задачу ещё раз — можно нажать «Прочитай мне».');renderPlay();}}
+function onNum(i){if(P.phase!=='nums'||P.found.includes(i))return;P.found.push(i);P.fb=null;if(P.found.length===T.known.length){P.fb={ok:true,t:'Все числа найдены! Они уже в блокноте.'};nextPhase('find');}else renderPlay();}
+function onQ(i){const ok=T.qOpts[i]===plain(T.ask);if(ok){P.fb={ok:true,t:'Верно! Это и есть вопрос задачи.'};nextPhase('scheme');}else{P.bad.push(i);wrong('Это мы уже знаем из условия. А что спрашивают? Посмотри на предложение со знаком «?».');renderPlay();}}
+function onScheme(i){const ok=T.schemeOpts[i]===T.scheme;if(ok){P.fb={ok:true,t:'Да! Схема готова — она в блокноте. Посмотри на неё: где знак «?»?'};nextPhase('op');}else{P.bad.push(i);wrong('Эта схема про другое. Подумай: '+(SHINT[T.scheme.split('>')[0]]||''));renderPlay();}}
+function onOp(o){const st=T.steps[P.si];if(o===st.op){P.fb={ok:true,t:'Правильно выбрано действие!'};nextPhase('calc');}else{P.bad.push(o);const more=st.res>st.a;wrong(`Подумай: ответ должен получиться больше, чем ${st.a}, или меньше? ${st.op===':'||st.op==='·'?'И есть ли тут одинаковые группы?':''}`.trim());renderPlay();}}
+function onKey(k){
+  if(k==='ok')return submitCalc();
+  const i=P.active;if(k==='del')P.input[i]=P.input[i].slice(0,-1);else if(P.input[i].length<3)P.input[i]=(P.input[i]==='0'?'':P.input[i])+k;
+  const st=T.steps[P.si];if(P.phase==='calc'&&st&&st.rem!==undefined&&i===0&&P.input[0].length>=String(st.res).length&&k!=='del')P.active=1;
+  renderPlay();
+}
+function submitCalc(){
+  if(P.phase==='calc'){const st=T.steps[P.si];const v=parseInt(P.input[0],10),r=parseInt(P.input[1],10);
+    if(isNaN(v)||(st.rem!==undefined&&isNaN(r))){P.fb={ok:false,t:st.rem!==undefined?'Впиши и ответ, и остаток (если ничего не осталось — 0).':'Впиши ответ кнопками с цифрами.'};renderPlay();return;}
+    if(v===st.res&&(st.rem===undefined||r===st.rem)){
+      const line=`${P.si+1}) ${st.a} ${st.op} ${st.b} = ${st.res}${st.rem!==undefined?` (ост. ${st.rem})`:''} (${st.unit}${st.rem!==undefined?`, ост. ${st.remUnit}`:''}) — ${st.label}`;
+      P.lines.push(T.steps.length>1?line:line.replace(/^1\) /,''));
+      P.fb={ok:true,t:'Верно посчитано!'};
+      if(P.si+1<T.steps.length){P.si++;nextPhase('op');}else nextPhase('check');
+    }else{P.calcMistakes++;let t=pick(SOFT);
+      if(st.rem!==undefined&&v===st.res)t='Сколько помещается — верно! А остаток проверь: сколько не хватило до '+st.a+'?';
+      else if(st.rem!==undefined&&r>=st.b)t=`Остаток должен быть меньше ${st.b}. Если осталось ${st.b} или больше — значит, поместится ещё раз!`;
+      wrong(t);if(P.calcMistakes>=2&&P.hint<1)P.hint=1;P.input=['',''];P.active=0;renderPlay();}
+    return;}
+  if(P.phase==='check'){const v=parseInt(P.input[0],10);if(isNaN(v)){P.fb={ok:false,t:'Впиши, что получилось.'};renderPlay();return;}
+    if(v===T.check.val){finish();}else{wrong(`Получилось не ${v}. Посчитай ещё раз по шагам — должно выйти число из условия.`);if(P.hint<1)P.hint=1;P.input=['',''];renderPlay();}}
+}
+const PRAISE=['Ты разобралась с задачей шаг за шагом — так и решают настоящие математики!','Числа найдены, вопрос найден, схема нарисована. Вот это работа!','Ты проверила ответ — значит, точно знаешь, что он верный.','Схема помогла увидеть задачу. Отличный ход!','Задача решена! Мозг стал чуточку сильнее.'];
+function finish(){
+  P.phase='done';const clean=P.calcMistakes===0;const lv=T.level;const gain=3+(P.mistakes===0?2:0);
+  S.fish+=gain;S.total++;S.solved[lv]=(S.solved[lv]||0)+1;S.streak[lv]=clean?(S.streak[lv]||0)+1:Math.max(0,(S.streak[lv]||0)-1);
+  let unlocked=false;if(S.streak[lv]>=GOAL&&lv===S.unlocked&&lv<6){S.unlocked++;unlocked=true;}save();
+  renderPlay();chime();confetti();
+  layer.innerHTML=`<div class="overlay" role="dialog" aria-modal="true" aria-label="Задача решена"><div class="modal center reward pop">${catSVG(S.cat,{wear:S.wear,mood:'happy'},'cat')}
+  <h2>Ура! Задача решена!</h2><div class="big">+${gain} ${pw(gain,'fish')}</div>
+  <p style="margin:0">${esc(T.sense)}</p><p style="margin:0">${P.mistakes===0?pick(PRAISE):'Было непросто, но ты справилась. Ошибки помогают учиться — без них никак!'}</p>
+  ${unlocked?`<p style="margin:0;background:var(--sun2);padding:10px 14px;border-radius:16px">Открыт новый уровень: «${LV[lv+1].t}»!</p>`:''}
+  <div class="row" style="justify-content:center"><button class="btn main" data-act="again">Ещё задачку</button>${unlocked?`<button class="btn sun" data-act="nextlvl">На новый уровень</button>`:''}<button class="btn mint" data-act="shop">К котику</button></div></div></div>`;
+}
+
+function parents(){
+  layer.innerHTML=`<div class="overlay" role="dialog" aria-modal="true" aria-label="Для взрослых"><div class="modal">
+  <h2>Для взрослых</h2>
+  <p>Игра учит не считать быстрее, а понимать задачу. Каждая задача решается в шесть шагов: понять текст (про кого задача и как пересказать её своими словами), найти числа (что известно), выбрать вопрос (что найти), выбрать схему, выбрать действие и посчитать, проверить ответ обратным действием.</p>
+  <p>Первый шаг сделан специально для детей, которые читают бегло, но не понимают прочитанного: пока ребёнок не ответил, про кого задача и что в ней спрашивают, считать игра не даёт. Слова-подсказки («по», «каждый», «остальные», «осталось», «таких же», «поровну», «на … больше») подчёркнуты волной и объяснены в блокноте. Порядок шагов и записи (краткая запись, схема, таблица «Цена · Количество · Стоимость», решение по действиям, «Ответ:», «ост.») совпадает с тем, как учат по учебнику Моро («Школа России»).</p>
+  <ul><li>10–15 минут в день достаточно. Лучше 3 задачи с удовольствием, чем 10 через слёзы.</li>
+  <li>Сидите рядом первые дни. Просите ребёнка пересказать задачу своими словами и показать на схеме, где «?».</li>
+  <li>Подсказки идут ступеньками: сначала вопрос, потом рисунок, потом половина решения. Пользоваться ими можно и нужно — рыбки за это не отнимаются.</li>
+  <li>Ошибка никогда не наказывается. За задачу без ошибок котик получает 5 рыбок, с ошибками — 3.</li>
+  <li>Новый уровень открывается после ${GOAL} задач подряд, посчитанных без ошибок. Ошибка в счёте убирает один кружочек, а не все.</li>
+  <li>Уровни: 1 — сложение и вычитание; 2 — «больше на / меньше на»; 3 — умножение и деление как равные группы; 4 — цена, количество, стоимость; 5 — задачи в два действия (как про стулья); 6 — деление с остатком (как про карандаши).</li>
+  <li>«Прочитай мне» использует голос браузера. Если русского голоса нет, прочитайте задачу вслух сами.</li>
+  <li>Прогресс хранится только в этом браузере на этом устройстве.</li></ul>
+  <div class="row"><button class="btn sky small" data-act="unlockall">Открыть все уровни</button><button class="btn small" data-act="changecat">Сменить котика</button><button class="btn small" data-act="reset1">Начать заново</button></div>
+  <div id="resetBox" hidden class="hintbox">Стереть всё: котика, рыбки и уровни? <div class="row" style="margin-top:8px"><button class="btn small main" data-act="reset2">Да, стереть</button><button class="btn small" data-act="resetNo">Нет</button></div></div>
+  <button class="btn main" data-act="close">Закрыть</button></div></div>`;
+}
+
+/* ---------- события ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||b.disabled)return;const d=b.dataset;
+  if(d.cat){setupCat=d.cat;const v=(document.getElementById('catname')||{}).value;if(v!==undefined)S.name=v;renderSetup();return;}
+  if(d.nm){const inp=document.getElementById('catname');if(inp)inp.value=d.nm;return;}
+  if(d.lvl){const l=+d.lvl;if(l>S.unlocked){toast('Этот уровень пока закрыт. Реши ещё задачки на уровне '+S.unlocked+'!');return;}newTask(l);return;}
+  if(d.tab){shopTab=d.tab;renderShop();return;}
+  if(d.buy){const it=IT[d.buy];if(S.fish>=it.p&&!S.owned.includes(d.buy)){S.fish-=it.p;S.owned.push(d.buy);if(!isOn(d.buy))toggle(d.buy);save();chime();toast(`${it.n} — теперь у котика!`);}renderShop();return;}
+  if(d.tog){toggle(d.tog);renderShop();return;}
+  if(d.rq!==undefined){onRQ(+d.rq);return;}
+  if(d.num!==undefined){onNum(+d.num);return;}
+  if(d.q!==undefined){onQ(+d.q);return;}
+  if(d.sc!==undefined){onScheme(+d.sc);return;}
+  if(d.op){onOp(d.op);return;}
+  if(d.key){onKey(d.key);return;}
+  if(d.box!==undefined){P.active=+d.box;renderPlay();return;}
+  const a=d.act;if(!a)return;
+  if(a==='home'){layer.innerHTML='';go('home');}
+  else if(a==='shop'){layer.innerHTML='';go('shop');}
+  else if(a==='parents')parents();
+  else if(a==='close'||a==='resetNo'){if(a==='resetNo'){document.getElementById('resetBox').hidden=true;}else layer.innerHTML='';}
+  else if(a==='startgame'){const v=(document.getElementById('catname').value||'').trim();S.cat=setupCat;S.name=v||'Мурзик';save();go('home');}
+  else if(a==='again'){layer.innerHTML='';newTask(T.level);}
+  else if(a==='nextlvl'){layer.innerHTML='';newTask(T.level+1);}
+  else if(a==='read')speak(T.text);
+  else if(a==='sayStep'){const el=document.querySelector('.bubble .say');const h=document.querySelector('.hintbox');speak((el?el.textContent:'')+' '+(h?h.textContent:''));}
+  else if(a==='hint'){if(P.phase==='nums'&&P.hint===2){const i=T.known.findIndex((_,j)=>!P.found.includes(j));P.hint=3;if(i>=0){onNum(i);return;}}
+    if(P.phase==='read'&&P.hint===2){const Q=T.rq[P.rqi];const i=Q.opts.findIndex((q,j)=>j!==Q.ok&&!P.bad.includes(j));if(i>=0)P.bad.push(i);}
+    if(P.phase==='find'&&P.hint===2){const i=T.qOpts.findIndex((q,j)=>q!==plain(T.ask)&&!P.bad.includes(j));if(i>=0)P.bad.push(i);}
+    if(P.phase==='scheme'&&P.hint===2){const i=T.schemeOpts.findIndex((q,j)=>q!==T.scheme&&!P.bad.includes(j));if(i>=0)P.bad.push(i);}
+    P.hint++;if(P.fb&&P.fb.ok)P.fb=null;renderPlay();scrollStep();}
+  else if(a==='unlockall'){S.unlocked=6;save();layer.innerHTML='';toast('Все уровни открыты.');render();}
+  else if(a==='changecat'){layer.innerHTML='';setupCat=S.cat||'ginger';S.cat=null;save();render();}
+  else if(a==='reset1'){document.getElementById('resetBox').hidden=false;}
+  else if(a==='reset2'){S=DEF();save();layer.innerHTML='';setupCat='ginger';render();}
+});
+document.addEventListener('input',e=>{if(e.target.id==='catname')S.name=e.target.value;});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&layer.innerHTML){layer.innerHTML='';return;}
+  if(screen!=='play'||!P||(P.phase!=='calc'&&P.phase!=='check')||layer.innerHTML)return;
+  if(/^[0-9]$/.test(e.key)){onKey(e.key);e.preventDefault();}else if(e.key==='Backspace'){onKey('del');e.preventDefault();}else if(e.key==='Enter'){onKey('ok');e.preventDefault();}
+});
+window.__kotiki={GEN,makeTask,evalExpr,plural,state:()=>S,task:()=>T,prog:()=>P,newTask};
+render();
+})();
+</script>
+
+</body></html>
